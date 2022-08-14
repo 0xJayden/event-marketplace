@@ -3,13 +3,13 @@ import { Dialog, Transition } from "@headlessui/react";
 import { useRecoilState } from "recoil";
 import { modalState, eventNameState } from "../atoms/modalAtom";
 
-export default function modal({ account }) {
+export default function modal({ account }: { account: string }) {
   const [openModal, setOpenModal] = useRecoilState(modalState);
   const [eventName, setEventName] = useRecoilState(eventNameState);
 
   const [comment, setComment] = useState("");
 
-  const sendComment = async (e) => {
+  const sendComment = async (e: any) => {
     e.preventDefault();
 
     const body = {

@@ -1,21 +1,22 @@
 import getEventData from "../../components/get-event-data";
 import Web3 from "web3";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, BaseSyntheticEvent } from "react";
 import { useRouter } from "next/router";
 import Navbar from "../../components/Navbar";
 import CreatedEvent from "../../abis/Event.json";
+import { AbiItem } from "web3-utils";
 
 export default function profile() {
   const { data, error } = getEventData();
-  const [web3, setWeb3] = useState(null);
-  const [currentNetwork, setCurrentNetwork] = useState(null);
-  const [account, setAccount] = useState(null);
-  const [isError, setIsError] = useState(null);
-  const [balances, setBalances] = useState([]);
-  const [pfp, setPfp] = useState(null);
+  const [web3, setWeb3] = useState<Web3 | null>(null);
+  const [currentNetwork, setCurrentNetwork] = useState<number>();
+  const [account, setAccount] = useState("");
+  const [isError, setIsError] = useState(false);
+  const [balances, setBalances] = useState<Array<{}>>();
+  const [pfp, setPfp] = useState<string>();
   const [isPfpSelected, setIsPfpSelected] = useState(false);
 
-  const imageInputRef = useRef();
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const router = useRouter();
 
@@ -32,10 +33,10 @@ export default function profile() {
         console.log("please install metamask");
       }
 
-      window.ethereum.on("accountsChanged", (accounts) => {
+      window.ethereum.on("accountsChanged", (accounts: Array<string>) => {
         setAccount(accounts[0]);
       });
-      window.ethereum.on("chainChanged", (chainId) => {
+      window.ethereum.on("chainChanged", (chainId: number) => {
         window.location.reload();
       });
     } else {
@@ -56,17 +57,21 @@ export default function profile() {
   };
 
   const loadBalances = () => {
-    let newBalances = [];
+    let newBalances: Array<{}> = [];
 
-    data?.events.map(async (e) => {
-      let newEvent = new web3.eth.Contract(CreatedEvent.abi, e.address);
+    if (web3)
+      data.events.map(async (e: any) => {
+        let newEvent = new web3.eth.Contract(
+          CreatedEvent.abi as AbiItem[],
+          e.address
+        );
 
-      let balance = await newEvent.methods.balanceOf(account, 0).call();
-      if (balance > 0) {
-        newBalances.push(e);
-        setBalances(newBalances);
-      }
-    });
+        let balance = await newEvent.methods.balanceOf(account, 0).call();
+        if (balance > 0) {
+          newBalances.push(e);
+          setBalances(newBalances);
+        }
+      });
   };
 
   const web3Handler = async () => {
@@ -80,7 +85,7 @@ export default function profile() {
     }
   };
 
-  const setProfilePicture = (e) => {
+  const setProfilePicture = (e: BaseSyntheticEvent) => {
     const image = e.target.files[0];
     // setImage(image);
     if (!image) return;
@@ -88,6 +93,12 @@ export default function profile() {
     let fileReader = new FileReader();
     fileReader.readAsDataURL(image);
     fileReader.addEventListener("load", (e) => {
+      if (
+        e.target == null ||
+        e.target.result == null ||
+        typeof e.target.result !== "string"
+      )
+        return;
       setPfp(e.target.result);
       setIsPfpSelected(true);
     });
@@ -110,7 +121,7 @@ export default function profile() {
       <Navbar account={account} web3Handler={web3Handler} />
       <div className={`h-[100px] w-full bg-gray-100 cursor-pointer `}></div>
       <div
-        onClick={() => imageInputRef.current.click()}
+        onClick={() => imageInputRef.current?.click()}
         className="absolute shadow-md bg-white top-[120px] ml-4 h-[90px] w-[90px] rounded-full border cursor-pointer"
       >
         <input
@@ -133,14 +144,17 @@ export default function profile() {
       <div className="mx-4 mt-10 border-b">
         <p className="font-semibold underline underline-offset-4">Tickets</p>
       </div>
-      {balances.map((e) => (
-        <div className="grid grid-cols-2 p-4 max-w-[400px]">
-          <div className="shadow-md rounded">
+      <div className="grid gap-2 grid-cols-2 m-4 justify-center items-center">
+        {balances?.map((e: any) => (
+          <div
+            key={e.name}
+            className="flex flex-col justify-center shadow-md rounded w-full"
+          >
             <div className="p-2">{e.name}</div>
             <img src={e.image} />
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

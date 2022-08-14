@@ -35,9 +35,8 @@ const handler = async (req, res) => {
           {
             headers: {
               ...body.getHeaders(),
-              pinata_api_key: "5aef2b1a41bd1e3d2a8a",
-              pinata_secret_api_key:
-                "9c0571afea4992446f4adf836b41785fa85b5a8e5a68e6757d208c839f315ed0",
+              pinata_api_key: process.env.PINATA_API_KEY,
+              pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY,
             },
           }
         );
@@ -61,17 +60,14 @@ const handler = async (req, res) => {
           {
             headers: {
               "Content-Type": "application/json",
-              pinata_api_key: "5aef2b1a41bd1e3d2a8a",
-              pinata_secret_api_key:
-                "9c0571afea4992446f4adf836b41785fa85b5a8e5a68e6757d208c839f315ed0",
+              pinata_api_key: process.env.PINATA_API_KEY,
+              pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY,
             },
           }
         );
 
         // store cid from pinata result in database
-        const client = await MongoClient.connect(
-          "mongodb+srv://jay:8614@cluster0.i6d1y.mongodb.net/?retryWrites=true&w=majority"
-        );
+        const client = await MongoClient.connect(process.env.DB_URI);
         const db = client.db();
 
         const eventsCollection = db.collection("events");

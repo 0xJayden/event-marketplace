@@ -1,9 +1,7 @@
 import { MongoClient } from "mongodb";
 
 const handler = async (req, res) => {
-  const client = await MongoClient.connect(
-    "mongodb+srv://jay:8614@cluster0.i6d1y.mongodb.net/?retryWrites=true&w=majority"
-  );
+  const client = await MongoClient.connect(process.env.DB_URI);
   const db = client.db();
 
   const eventsCollection = db.collection("events");

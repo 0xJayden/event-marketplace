@@ -1,8 +1,6 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, BaseSyntheticEvent } from "react";
 import CreateEvent from "../abis/CreateEvent.json";
 import Web3 from "web3";
-// import { eventState } from "../atoms/modalAtom";
-import getEventData from "../components/get-event-data";
 import Loading from "../components/Loading";
 import ConfirmEventCreation from "../components/ConfirmEventCreation";
 import Cancelling from "../components/Cancelling";
@@ -10,29 +8,24 @@ import Confirming from "../components/Confirming";
 import EventCreationSuccess from "../components/EventCreationSuccess";
 import { PhotographIcon, XIcon } from "@heroicons/react/outline";
 import Navbar from "../components/Navbar";
+import { AbiItem } from "web3-utils";
 
 export default function createEvent() {
-  const nameInputRef = useRef();
-  const amountOfTicketsInputRef = useRef();
-  const costPerTicketInputRef = useRef();
-  const descriptionInputRef = useRef();
-  const imageInputRef = useRef();
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const amountOfTicketsInputRef = useRef<HTMLInputElement>(null);
+  const costPerTicketInputRef = useRef<HTMLInputElement>(null);
+  const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
-  // const [event, setEvent] = useRecoilState(eventState);
-
-  const [web3, setWeb3] = useState(null);
-  const [currentNetwork, setCurrentNetwork] = useState(null);
-  const [account, setAccount] = useState(null);
-  const [event, setEvent] = useState(null);
-  const [isError, setIsError] = useState(null);
+  const [web3, setWeb3] = useState<Web3 | null>(null);
+  const [account, setAccount] = useState("");
 
   const [isImageSelected, setIsImageSelected] = useState(false);
-  const [imagePreviewSrc, setImagePreviewSrc] = useState(null);
-  const [image, setImage] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null);
+  const [imagePreviewSrc, setImagePreviewSrc] = useState("");
+  const [image, setImage] = useState<string | Blob>("");
   const [eventPlaced, setEventPlaced] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [eventName, setEventName] = useState("fakeName");
+  const [eventName, setEventName] = useState("");
   const [cancelling, setCancelling] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -50,34 +43,14 @@ export default function createEvent() {
         console.log("please install metamask");
       }
 
-      window.ethereum.on("accountsChanged", (accounts) => {
+      window.ethereum.on("accountsChanged", (accounts: Array<string>) => {
         setAccount(accounts[0]);
       });
-      window.ethereum.on("chainChanged", (chainId) => {
+      window.ethereum.on("chainChanged", (chainId: number) => {
         window.location.reload();
       });
     } else {
       console.log("error");
-    }
-  };
-
-  // load all blockchain data, network id, contracts.
-  const loadBlockchainData = async () => {
-    if (web3) {
-      const networkId = await web3.eth.net.getId();
-      setCurrentNetwork(networkId);
-
-      const newEvent = new web3.eth.Contract(
-        CreateEvent.abi,
-        CreateEvent.networks[networkId].address
-      );
-      setEvent(newEvent);
-      console.log(newEvent);
-    } else {
-      setIsError(true);
-      console.log(
-        "Contract not deployed to current network, please change network in MetaMask"
-      );
     }
   };
 
@@ -93,34 +66,41 @@ export default function createEvent() {
     }
   };
 
-  const submitHandler = async (e) => {
+  const submitHandler = async (e: BaseSyntheticEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const enteredName = nameInputRef.current.value;
-    setEventName(enteredName);
-    const enteredAmountOfTickets = amountOfTicketsInputRef.current.value;
-    const enteredCostPerTicket = costPerTicketInputRef.current.value;
-    const enteredDescription = descriptionInputRef.current.value;
+    const enteredName = nameInputRef.current?.value;
+    const enteredAmountOfTickets = amountOfTicketsInputRef.current?.value;
+    const enteredCostPerTicket = costPerTicketInputRef.current?.value;
+    const enteredDescription = descriptionInputRef.current?.value;
 
-    const body = new FormData();
-    body.append("file", image);
-    body.append("account", account);
-    body.append("name", enteredName);
-    body.append("image", imagePreviewSrc);
-    body.append("amountOfTickets", enteredAmountOfTickets);
-    body.append("costPerTicket", enteredCostPerTicket);
-    body.append("description", enteredDescription);
+    if (
+      enteredName &&
+      enteredAmountOfTickets &&
+      enteredCostPerTicket &&
+      enteredDescription
+    ) {
+      setEventName(enteredName);
+      const body = new FormData();
+      body.append("file", image);
+      body.append("account", account);
+      body.append("name", enteredName);
+      body.append("image", imagePreviewSrc);
+      body.append("amountOfTickets", enteredAmountOfTickets);
+      body.append("costPerTicket", enteredCostPerTicket);
+      body.append("description", enteredDescription);
 
-    const res = await fetch("api/newEvent", {
-      method: "POST",
-      body,
-    })
-      .then(() => setIsLoading(false))
-      .then(() => setEventPlaced(true));
+      const res = await fetch("api/newEvent", {
+        method: "POST",
+        body,
+      })
+        .then(() => setIsLoading(false))
+        .then(() => setEventPlaced(true));
+    }
   };
 
-  const showImagePreview = (e) => {
+  const showImagePreview = (e: BaseSyntheticEvent) => {
     const image = e.target.files[0];
     setImage(image);
     if (!image) return;
@@ -128,50 +108,70 @@ export default function createEvent() {
     let fileReader = new FileReader();
     fileReader.readAsDataURL(image);
     fileReader.addEventListener("load", (e) => {
-      setImagePreviewSrc(e.target.result);
+      if (e.target == null) return;
+      if (e.target.result == null || typeof e.target.result !== "string")
+        return;
+      const result = e.target.result;
+      setImagePreviewSrc(result);
       setIsImageSelected(true);
     });
   };
 
   const createEvent = async () => {
     setConfirming(true);
-    const result = await fetch("api/get-events").then((res) => res.json());
 
-    for (let i = 0; result.events.length > i; i++) {
-      if (result.events[i].name === eventName) {
-        await event.methods
-          .create(
-            result.events[i].name,
-            result.events[i].cid,
-            result.events[i].amountOfTickets,
-            result.events[i].costPerTicket
-          )
-          .send({ from: account, value: 0 })
-          .on("confirmation", async (confirmationNumber, receipt) => {
-            const createdEventAddress = receipt.events["0"].address;
-            console.log(createdEventAddress);
-            const body = {
-              address: createdEventAddress,
-              name: eventName,
-            };
-            await fetch("api/post-event-address", {
-              method: "PUT",
-              body: JSON.stringify(body),
-              headers: {
-                "Content-Type": "application/json",
-              },
-            })
-              .then((res) => res.json())
-              .then((data) => {
-                console.log("Success:", data);
-              });
-            setConfirming(false);
-            setSuccess(true);
-          });
-      } else {
-        console.log("no matching events");
+    if (web3 == null) return;
+
+    const networkId = await web3.eth.net.getId();
+
+    if (networkId !== null) {
+      const newEvent = new web3.eth.Contract(
+        CreateEvent.abi as AbiItem[],
+        (CreateEvent.networks as any)[networkId].address
+      );
+      console.log(newEvent);
+
+      const result = await fetch("api/get-events").then((res) => res.json());
+
+      for (let i = 0; result.events.length > i; i++) {
+        if (result.events[i].name === eventName) {
+          await newEvent.methods
+            .create(
+              result.events[i].name,
+              result.events[i].cid,
+              result.events[i].amountOfTickets,
+              result.events[i].costPerTicket
+            )
+            .send({ from: account, value: 0 })
+            .on(
+              "confirmation",
+              async (confirmationNumber: any, receipt: any) => {
+                const createdEventAddress = receipt.events["0"].address;
+                console.log(createdEventAddress);
+                const body = {
+                  address: createdEventAddress,
+                  name: eventName,
+                };
+                await fetch("api/post-event-address", {
+                  method: "PUT",
+                  body: JSON.stringify(body),
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                })
+                  .then((res) => res.json())
+                  .then((data) => {
+                    console.log("Success:", data);
+                  });
+                setConfirming(false);
+                setSuccess(true);
+                setEventPlaced(false);
+              }
+            );
+        } else {
+          console.log("no matching events");
+        }
       }
-      setEventPlaced(false);
     }
   };
 
@@ -205,20 +205,16 @@ export default function createEvent() {
 
   useEffect(() => {
     loadWeb3();
-    loadBlockchainData();
   }, [account]);
-
-  const { data, error } = getEventData();
-  if (error) return "error";
 
   return (
     <div>
-      <Navbar web3Handler={web3Handler} />
+      <Navbar account={account} web3Handler={web3Handler} />
       {isLoading ? <Loading /> : null}
       {cancelling ? <Cancelling /> : null}
       {confirming ? <Confirming /> : null}
       {success ? <EventCreationSuccess setSuccess={setSuccess} /> : null}
-      <div className="flex fixed top-[100px] bottom-0 left-0 right-0 bg-white flex-col items-center">
+      <div className="flex my-4 flex-col items-center">
         <div className="flex items-start w-5/6">
           <h1 className="text-4xl font-bold my-4">Create Event</h1>
         </div>
@@ -273,7 +269,7 @@ export default function createEvent() {
           </div>
           <div
             className="flex my-4 max-w-min cursor-pointer"
-            onClick={() => imageInputRef.current.click()}
+            onClick={() => imageInputRef.current?.click()}
           >
             <PhotographIcon className="h-7" />
             <input

@@ -1,13 +1,10 @@
 import { useRouter } from "next/router";
 
-export default function EventCreationSuccess({
-  setSuccess,
-  setOpenCreateEvent,
-}) {
+export default function EventCreationSuccess({ setSuccess }) {
   const router = useRouter();
   const handler = () => {
     setSuccess(false);
-    setOpenCreateEvent(false);
+    router.push("/explore-events");
   };
   return (
     <div className="flex flex-col fixed z-10 top-0 bottom-0 right-0 left-0 justify-center items-center backdrop-blur-md">

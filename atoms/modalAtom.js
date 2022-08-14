@@ -4,3 +4,8 @@ export const modalState = atom({
   key: "modalState",
   default: false,
 });
+
+export const eventNameState = atom({
+  key: "eventNameState",
+  default: "",
+});

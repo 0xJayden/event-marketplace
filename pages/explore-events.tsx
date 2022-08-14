@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Web3 from "web3";
-import { abi } from "../abis/Event.json";
+import CreatedEvent from "../abis/Event.json";
 import FeedItem from "../components/Feed-Item";
 import getEventData from "../components/get-event-data";
 import Navbar from "../components/Navbar";
@@ -72,7 +72,10 @@ export default function exploreEvents() {
 
   const mint = async (address: string, value: number, id: number) => {
     if (web3) {
-      const eventContract = new web3.eth.Contract(abi as AbiItem[], address);
+      const eventContract = new web3.eth.Contract(
+        CreatedEvent.abi as AbiItem[],
+        address
+      );
       console.log(eventContract);
       await eventContract.methods
         .mint(1, id)
