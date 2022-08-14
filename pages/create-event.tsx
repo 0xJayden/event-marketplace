@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, BaseSyntheticEvent } from "react";
-import CreateEvent from "../abis/CreateEvent.json";
+import CreateEventAbi from "../abis/CreateEvent.json";
 import Web3 from "web3";
 import Loading from "../components/Loading";
 import ConfirmEventCreation from "../components/ConfirmEventCreation";
@@ -10,7 +10,7 @@ import { PhotographIcon, XIcon } from "@heroicons/react/outline";
 import Navbar from "../components/Navbar";
 import { AbiItem } from "web3-utils";
 
-export default function createEvent() {
+export default function CreateEvent() {
   const nameInputRef = useRef<HTMLInputElement>(null);
   const amountOfTicketsInputRef = useRef<HTMLInputElement>(null);
   const costPerTicketInputRef = useRef<HTMLInputElement>(null);
@@ -126,8 +126,8 @@ export default function createEvent() {
 
     if (networkId !== null) {
       const newEvent = new web3.eth.Contract(
-        CreateEvent.abi as AbiItem[],
-        (CreateEvent.networks as any)[networkId].address
+        CreateEventAbi.abi as AbiItem[],
+        (CreateEventAbi.networks as any)[networkId].address
       );
       console.log(newEvent);
 
