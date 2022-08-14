@@ -3,7 +3,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { useRecoilState } from "recoil";
 import { modalState, eventNameState } from "../atoms/modalAtom";
 
-export default function modal({ account }: { account: string }) {
+export default function Modal({ account }: { account: string }) {
   const [openModal, setOpenModal] = useRecoilState(modalState);
   const [eventName, setEventName] = useRecoilState(eventNameState);
 

@@ -5,7 +5,7 @@ import Navbar from "../../components/Navbar";
 import CreatedEvent from "../../abis/Event.json";
 import { AbiItem } from "web3-utils";
 
-export default function profile() {
+export default function Profile() {
   const [web3, setWeb3] = useState<Web3 | null>(null);
   const [account, setAccount] = useState("");
   const [balances, setBalances] = useState<Array<{}>>();

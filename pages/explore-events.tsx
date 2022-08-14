@@ -17,7 +17,7 @@ interface Event {
   description: string;
 }
 
-export default function exploreEvents() {
+export default function ExploreEvents() {
   const [web3, setWeb3] = useState<Web3 | null>(null);
   const [currentNetwork, setCurrentNetwork] = useState<number | null>(null);
   const [account, setAccount] = useState("");
