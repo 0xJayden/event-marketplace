@@ -4,7 +4,7 @@ const handler = async (req, res) => {
   if (req.method === "POST") {
     const data = req.body;
     const account = data.account;
-    const pfp = data.pfpImage;
+    const banner = data.bannerImage;
     console.log(data);
 
     const client = await MongoClient.connect(process.env.DB_URI);
@@ -14,7 +14,7 @@ const handler = async (req, res) => {
 
     const result = await eventsCollection.updateOne(
       { account: { $eq: account } },
-      { $set: { pfp: pfp } },
+      { $set: { banner: banner } },
       {
         upsert: true,
       }

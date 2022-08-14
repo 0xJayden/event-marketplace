@@ -208,124 +208,126 @@ export default function createEvent() {
   }, [account]);
 
   return (
-    <div>
+    <>
       <Navbar account={account} web3Handler={web3Handler} />
-      {isLoading ? <Loading /> : null}
-      {cancelling ? <Cancelling /> : null}
-      {confirming ? <Confirming /> : null}
-      {success ? <EventCreationSuccess setSuccess={setSuccess} /> : null}
-      <div className="flex my-4 flex-col items-center">
-        <div className="flex items-start w-5/6">
-          <h1 className="text-4xl font-bold my-4">Create Event</h1>
-        </div>
-        <div className="flex items-start w-5/6 text-sm mb-4">
-          <p>
-            <span className=" text-red-500">*</span> Required Fields
-          </p>
-        </div>
-
-        <form
-          className="flex space-y-2 flex-col w-5/6 max-w-[1000px]"
-          onSubmit={submitHandler}
-          id="eventCreate"
-        >
-          <div className="flex">
-            <p>Name</p>
-            <span className=" text-red-500 ml-1">*</span>
+      <div className="flex w-full justify-center">
+        {isLoading ? <Loading /> : null}
+        {cancelling ? <Cancelling /> : null}
+        {confirming ? <Confirming /> : null}
+        {success ? <EventCreationSuccess setSuccess={setSuccess} /> : null}
+        <div className="flex my-4 flex-col items-center w-5/6 sm:max-w-[1000px]">
+          <div className="flex items-start w-5/6 sm:w-auto">
+            <h1 className="text-4xl font-bold my-4">Create Event</h1>
           </div>
-          <input
-            className="p-2 w-full text-sm sm:text-lg border rounded outline-none"
-            required
-            type="text"
-            placeholder="Name of Event"
-            ref={nameInputRef}
-          ></input>
-          <div className="flex">
-            <p>Amount of Tickets</p>
-            <span className=" text-red-500 ml-1">*</span>
+          <div className="flex items-start w-5/6 sm:w-auto text-sm mb-4">
+            <p>
+              <span className=" text-red-500">*</span> Required Fields
+            </p>
           </div>
 
-          <input
-            required
-            className="p-2 border text-sm sm:text-lg rounded outline-none"
-            type="text"
-            placeholder="Amount"
-            ref={amountOfTicketsInputRef}
-          ></input>
-          <div className="flex">
-            <p>Cost per Ticket</p>
-            <span className=" text-red-500 ml-1">*</span>
-          </div>
-          <input
-            required
-            className="p-2 border text-sm sm:text-lg rounded outline-none"
-            type="text"
-            placeholder="Cost"
-            ref={costPerTicketInputRef}
-          ></input>
-          <div className="flex">
-            <p>Select Image</p>
-            <span className=" text-red-500 ml-1">*</span>
-          </div>
-          <div
-            className="flex my-4 max-w-min cursor-pointer"
-            onClick={() => imageInputRef.current?.click()}
+          <form
+            className="flex space-y-2 flex-col w-full"
+            onSubmit={submitHandler}
+            id="eventCreate"
           >
-            <PhotographIcon className="h-7" />
-            <input
-              className="text-xs ml-8 w-1/2"
-              required
-              type="file"
-              name="photo"
-              id="photo"
-              onChange={showImagePreview}
-              ref={imageInputRef}
-              hidden
-            ></input>
-          </div>
-          {isImageSelected ? (
-            <div className="relative flex justify-center">
-              <button
-                onClick={() => {
-                  setIsImageSelected(!isImageSelected);
-                }}
-                className="absolute flex justify-center items-center left-20 sm:left-[420px] rounded-full w-8 h-8 cursor-pointer opacity-75 hover:bg-red-300 transition duration-200 ease-out"
-              >
-                <XIcon className="h-5" />
-              </button>
-              <img
-                className="max-w-[150px] border rounded-md"
-                src={imagePreviewSrc}
-              />
+            <div className="flex">
+              <p>Name</p>
+              <span className=" text-red-500 ml-1">*</span>
             </div>
-          ) : null}
-          <div className="flex">
-            <p>Describe the event</p>
-            <span className=" text-red-500 ml-1">*</span>
-          </div>
-          <div className="flex overflow-y-scroll">
-            <textarea
+            <input
+              className="p-2 w-full text-sm sm:text-lg border rounded outline-none"
               required
-              className="w-full outline-none p-2 text-sm sm:text-lg border rounded min-h-[48px] max-h-36"
-              placeholder="Description"
-              form="eventCreate"
-              ref={descriptionInputRef}
-            ></textarea>
-          </div>
+              type="text"
+              placeholder="Name of Event"
+              ref={nameInputRef}
+            ></input>
+            <div className="flex">
+              <p>Amount of Tickets</p>
+              <span className=" text-red-500 ml-1">*</span>
+            </div>
 
-          <div className="flex justify-end">
-            <button
-              className="p-2 sm:p-4 border-2 w-1/4 sm:max-w-[150px] border-black rounded-md hover:bg-black hover:text-white transition duration-200 ease-out"
-              type="submit"
+            <input
+              required
+              className="p-2 border text-sm sm:text-lg rounded outline-none"
+              type="text"
+              placeholder="Amount"
+              ref={amountOfTicketsInputRef}
+            ></input>
+            <div className="flex">
+              <p>Cost per Ticket</p>
+              <span className=" text-red-500 ml-1">*</span>
+            </div>
+            <input
+              required
+              className="p-2 border text-sm sm:text-lg rounded outline-none"
+              type="text"
+              placeholder="Cost"
+              ref={costPerTicketInputRef}
+            ></input>
+            <div className="flex">
+              <p>Select Image</p>
+              <span className=" text-red-500 ml-1">*</span>
+            </div>
+            <div
+              className="flex my-4 max-w-min cursor-pointer"
+              onClick={() => imageInputRef.current?.click()}
             >
-              Submit
-            </button>
-          </div>
-        </form>
-        {eventPlaced ? (
-          <ConfirmEventCreation createEvent={createEvent} cancel={cancel} />
-        ) : null}
+              <PhotographIcon className="h-7" />
+              <input
+                className="text-xs ml-8 w-1/2"
+                required
+                type="file"
+                name="photo"
+                id="photo"
+                onChange={showImagePreview}
+                ref={imageInputRef}
+                hidden
+              ></input>
+            </div>
+            {isImageSelected ? (
+              <div className="relative flex justify-center">
+                <button
+                  onClick={() => {
+                    setIsImageSelected(!isImageSelected);
+                  }}
+                  className="absolute flex justify-center items-center left-20 sm:left-[420px] rounded-full w-8 h-8 cursor-pointer opacity-75 hover:bg-red-300 transition duration-200 ease-out"
+                >
+                  <XIcon className="h-5" />
+                </button>
+                <img
+                  className="max-w-[150px] border rounded-md"
+                  src={imagePreviewSrc}
+                />
+              </div>
+            ) : null}
+            <div className="flex">
+              <p>Describe the event</p>
+              <span className=" text-red-500 ml-1">*</span>
+            </div>
+            <div className="flex overflow-y-scroll">
+              <textarea
+                required
+                className="w-full outline-none p-2 text-sm sm:text-lg border rounded min-h-[48px] max-h-36"
+                placeholder="Description"
+                form="eventCreate"
+                ref={descriptionInputRef}
+              ></textarea>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                className="p-2 sm:p-4 border-2 w-1/4 sm:max-w-[150px] border-black rounded-md hover:bg-black hover:text-white transition duration-200 ease-out"
+                type="submit"
+              >
+                Submit
+              </button>
+            </div>
+          </form>
+          {eventPlaced ? (
+            <ConfirmEventCreation createEvent={createEvent} cancel={cancel} />
+          ) : null}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

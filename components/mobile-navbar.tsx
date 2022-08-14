@@ -38,7 +38,7 @@ export default function MobileNavbar({ openMenu, web3Handler, account }: Menu) {
           onClick={() => {
             router.push("/explore-events");
           }}
-          className="flex justify-start items-center space-x-4"
+          className="flex justify-start items-center space-x-4 cursor-pointer"
         >
           <MapIcon className="h-7" />
           <p>Explore</p>
@@ -51,7 +51,7 @@ export default function MobileNavbar({ openMenu, web3Handler, account }: Menu) {
         </button>
         <li
           onClick={() => router.push(`/profile/${account}`)}
-          className="flex justify-start items-center space-x-4"
+          className="flex justify-start items-center space-x-4 cursor-pointer"
         >
           <UserIcon className="h-7" />
           <p>Profile</p>

@@ -104,22 +104,23 @@ export default function exploreEvents() {
   return (
     <>
       <Navbar account={account} web3Handler={web3Handler} />
-      {/* {openModal && <Modal account={account} />} */}
-      <div className="flex flex-col items-center gap-3 my-4 sm:grid-cols-4 sm:grid">
-        {data.events.map((event: Event) => (
-          <FeedItem
-            key={event?.name}
-            mint={mint}
-            time={event?.time}
-            address={event?.address}
-            account={event?.account}
-            name={event?.name}
-            image={event?.image}
-            amountOfTickets={event?.amountOfTickets}
-            costPerTicket={event?.costPerTicket}
-            description={event?.description}
-          />
-        ))}
+      <div className="flex justify-center w-full">
+        <div className="flex flex-col items-center gap-3 my-4 sm:grid-cols-4 sm:grid sm:max-w-[1000px]">
+          {data.events.map((event: Event) => (
+            <FeedItem
+              key={event?.name}
+              mint={mint}
+              time={event?.time}
+              address={event?.address}
+              account={event?.account}
+              name={event?.name}
+              image={event?.image}
+              amountOfTickets={event?.amountOfTickets}
+              costPerTicket={event?.costPerTicket}
+              description={event?.description}
+            />
+          ))}
+        </div>
       </div>
     </>
   );

@@ -1,3 +1,4 @@
+import { PhotographIcon } from "@heroicons/react/outline";
 import { useRouter } from "next/router";
 import getEventData from "./get-event-data";
 
@@ -32,14 +33,20 @@ export default function EventMarketplace() {
       <div className="flex flex-col w-full items-center justify-center mt-8 sm:mt-32">
         <p className="mb-4">Featured Event</p>
         <div className="flex relative justify-center w-5/6 sm:max-w-[350px] hover:scale-110 hover:shadow-md transition duration-300 ease-in-out">
-          <img
-            onClick={() => router.push(`/events/${data.events[0].name}`)}
-            className="rounded-md sm:max-w-[350px] sm:w-full"
-            src={data.events[0].image}
-          />
-          <div className="flex absolute w-full sm:max-w-[350px] p-4 bottom-0 rounded-b text-white text-3xl justify-start backdrop-blur-sm">
-            <p>{data.events[0].name}</p>
-          </div>
+          {data.events.length > 0 ? (
+            <>
+              <img
+                onClick={() => router.push(`/events/${data.events[0].name}`)}
+                className="rounded-md sm:max-w-[350px] sm:w-full"
+                src={data.events[0].image}
+              />
+              <div className="flex absolute w-full sm:max-w-[350px] p-4 bottom-0 rounded-b text-white text-3xl justify-start backdrop-blur-sm">
+                <p>{data.events[0].name}</p>
+              </div>
+            </>
+          ) : (
+            <PhotographIcon className="h-[100px]" />
+          )}
         </div>
       </div>
     </div>

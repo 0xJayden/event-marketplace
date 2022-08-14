@@ -38,16 +38,16 @@ export default function FeedItem({
 
   return (
     <ul
-      className={`text-start font-light mb-2 px-4 py-2 w-5/6 border rounded-lg shadow-md max-h-[500px] ${
+      className={`sm:relative text-start font-light mb-2 px-4 py-2 w-5/6 sm:max-w-[300px] border rounded-lg shadow-md sm:h-[430px] ${
         eventPage &&
         "min-w-full max-h-screen min-h-screen rounded-none border-0"
       } sm:w-full`}
     >
       <div className="flex justify-between">
-        <li className="max-w-[150px] overflow-hidden text-ellipsis pb-2">
+        <li className="sm:text-sm sm:max-w-[100px] max-w-[150px] overflow-hidden text-ellipsis pb-2">
           {account}
         </li>
-        <li>
+        <li className="sm:text-sm">
           <Moment fromNow>{time}</Moment>
         </li>
       </div>
@@ -59,10 +59,10 @@ export default function FeedItem({
       </li>
 
       <div className="flex justify-between">
-        <div>
+        <div className="sm:max-w-[130px]">
           <li className="pb-2">{name}</li>
           <p
-            className={`overflow-hidden text-[12px] max-h-[78px] max-w-[175px] text-ellipsis ${
+            className={`overflow-hidden text-[12px] max-h-[78px] sm:max-h-[40px] sm:max-w-[150px] max-w-[175px] text-ellipsis ${
               eventPage && "max-h-screen max-w-[200px]"
             }`}
           >
@@ -74,12 +74,12 @@ export default function FeedItem({
             <TicketIcon className="h-6 text-yellow-500" />
             <p>{amountOfTickets}</p>
           </li>
-          <li>Price: {costPerTicket} ETH</li>
+          <li className="sm:text-xs">Price: {costPerTicket} ETH</li>
         </div>
       </div>
       <div className="flex flex-col items-end my-2"></div>
 
-      <div className="flex justify-center">
+      <div className="flex justify-center sm:absolute sm:bottom-2 sm:w-5/6">
         {address ? (
           <div>
             <button
