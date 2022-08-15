@@ -1,7 +1,9 @@
 import { MongoClient } from "mongodb";
 
 const handler = async (req, res) => {
-  const client = await MongoClient.connect(process.env.DB_URI);
+  const client = await MongoClient.connect(
+    `mongodb+srv://${process.env.DB_URI}`
+  );
   const db = client.db();
 
   const eventsCollection = db.collection("events");
