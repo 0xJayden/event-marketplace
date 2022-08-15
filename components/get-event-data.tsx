@@ -3,7 +3,7 @@ import useSWR from "swr";
 export default function GetEventData() {
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const { data, error } = useSWR(
-    "http://localhost:3000/api/get-events",
+    "http://event-marketplace.vercel.app/api/get-events",
     fetcher
   );
 
