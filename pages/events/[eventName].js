@@ -1,4 +1,3 @@
-// import { MongoClient, ObjectId } from "mongodb";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useRecoilState } from "recoil";
@@ -101,7 +100,7 @@ export default function EventDetails() {
     loadWeb3();
     loadBlockchainData();
     findEvent();
-  }, [account, data, eventName]);
+  }, [account, eventName]);
 
   const { data, error } = getEventData();
 
