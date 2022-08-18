@@ -43,7 +43,15 @@ export default function MobileNavbar({ openMenu, web3Handler, account }: Menu) {
           <MapIcon className="h-7" />
           <p>Explore</p>
         </li>
-        <button onClick={() => router.push("/create-event")}>
+        <button
+          onClick={() => {
+            if (!account) {
+              router.push("/connect");
+            } else {
+              router.push(`/create-event`);
+            }
+          }}
+        >
           <li className="flex justify-start items-center space-x-4">
             <PlusIcon className="h-7" />
             <p>Create</p>
@@ -51,8 +59,11 @@ export default function MobileNavbar({ openMenu, web3Handler, account }: Menu) {
         </button>
         <li
           onClick={() => {
-            if (!account) return console.log("no account");
-            router.push(`/profile/${account}`);
+            if (!account) {
+              router.push("/connect");
+            } else {
+              router.push(`/profile/${account}`);
+            }
           }}
           className="flex justify-start items-center space-x-4 cursor-pointer"
         >

@@ -1,11 +1,15 @@
 import { useRouter } from "next/router";
 
 import Moment from "react-moment";
-import { TicketIcon } from "@heroicons/react/outline";
+import { useEffect, useState } from "react";
+import { useRecoilState } from "recoil";
+import { modalState, eventNameState } from "../atoms/modalAtom";
+import { ChatIcon, HeartIcon, TicketIcon } from "@heroicons/react/outline";
 
 interface EventItem {
   address: string;
   account: string;
+  user: string;
   time: Date;
   costPerTicket: number;
   mint: (address: string, costPerTicket: number, id: number) => Promise<void>;
@@ -14,11 +18,14 @@ interface EventItem {
   amountOfTickets: number;
   description: string;
   eventPage?: boolean;
+  likes?: Array<{ account: string }>;
+  comments?: Array<{ account: string; comment: string }>;
 }
 
 export default function FeedItem({
   address,
   account,
+  user,
   time,
   costPerTicket,
   mint,
@@ -27,8 +34,89 @@ export default function FeedItem({
   amountOfTickets,
   description,
   eventPage,
+  likes,
+  comments,
 }: EventItem) {
   const router = useRouter();
+
+  const [liked, setLiked] = useState(false);
+  const [openModal, setOpenModal] = useRecoilState(modalState);
+  const [eventName, setEventName] = useRecoilState(eventNameState);
+
+  useEffect(() => {
+    if (likes && likes?.length > 0) {
+      setLiked(
+        likes.findIndex(
+          (l) => l.account.toLowerCase() === user?.toLowerCase()
+        ) !== -1
+      );
+    }
+  }, [likes, user]);
+
+  const likePost = async () => {
+    const body = {
+      name: name,
+      account: account,
+    };
+
+    if (eventPage) {
+      if (likes && likes?.length > 0 && likes.map((l) => l.account === user)) {
+        setLiked(false);
+        await fetch("../api/remove-like", {
+          method: "DELETE",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("Success:", data);
+          });
+      } else {
+        setLiked(true);
+        await fetch("../api/add-like", {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("Success:", data);
+          });
+      }
+    } else {
+      if (likes && likes?.length > 0 && likes.map((l) => l.account === user)) {
+        setLiked(false);
+        await fetch("api/remove-like", {
+          method: "DELETE",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("Success:", data);
+          });
+      } else {
+        setLiked(true);
+        await fetch("api/add-like", {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("Success:", data);
+          });
+      }
+    }
+  };
 
   const getAddress = () => {
     const id = 0;
@@ -52,7 +140,7 @@ export default function FeedItem({
       </div>
       <li
         onClick={() => router.push(`/events/${name}`)}
-        className="flex justify-center"
+        className={`flex justify-center`}
       >
         <img
           className="mb-2 cursor-pointer border hover:scale-105 transition duration-300 ease-in-out"
@@ -62,6 +150,21 @@ export default function FeedItem({
 
       <div className="flex justify-between">
         <div className="sm:max-w-[130px]">
+          <div className="flex space-x-2">
+            <HeartIcon
+              className={`h-6 ${liked && "text-red-500"}`}
+              onClick={likePost}
+            />
+            <p>{likes?.length}</p>
+            <ChatIcon
+              onClick={() => {
+                setEventName(name);
+                setOpenModal(true);
+              }}
+              className="h-6 pl-2"
+            />
+            <div>{comments?.length}</div>
+          </div>
           <li className="pb-2">{name}</li>
           <p
             className={`overflow-hidden text-[12px] max-h-[78px] sm:max-h-[40px] sm:max-w-[150px] max-w-[175px] text-ellipsis ${
@@ -80,6 +183,19 @@ export default function FeedItem({
         </div>
       </div>
       <div className="flex flex-col items-end my-2"></div>
+      {eventPage && (
+        <div className="flex flex-col space-y-2 mb-2 text-sm">
+          <p className="font-bold">Comments</p>
+          {comments?.map((comment) => (
+            <div>
+              <div className="overflow-hidden space-y-2 py-2 text-ellipsis border-b">
+                <p className="text-gray-400 text-xs">{comment.account}</p>
+                <p>{comment.comment}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="flex justify-center sm:absolute sm:bottom-2 sm:w-5/6">
         {address ? (

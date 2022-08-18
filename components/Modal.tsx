@@ -1,11 +1,12 @@
 import { useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useRecoilState } from "recoil";
-import { modalState, eventNameState } from "../atoms/modalAtom";
+import { modalState, eventNameState, eventPage } from "../atoms/modalAtom";
 
 export default function Modal({ account }: { account: string }) {
   const [openModal, setOpenModal] = useRecoilState(modalState);
   const [eventName, setEventName] = useRecoilState(eventNameState);
+  const [isEventPage, setEventPage] = useRecoilState(eventPage);
 
   const [comment, setComment] = useState("");
 
@@ -18,16 +19,29 @@ export default function Modal({ account }: { account: string }) {
       comment,
     };
 
-    await fetch("api/add-comment", {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => console.log(data));
-    setOpenModal(false);
+    if (isEventPage) {
+      await fetch("../api/add-comment", {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => console.log(data));
+      setOpenModal(false);
+    } else {
+      await fetch("api/add-comment", {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => console.log(data));
+      setOpenModal(false);
+    }
   };
 
   return (

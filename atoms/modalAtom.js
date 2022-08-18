@@ -9,3 +9,8 @@ export const eventNameState = atom({
   key: "eventNameState",
   default: "",
 });
+
+export const eventPage = atom({
+  key: "eventPage",
+  default: false,
+});

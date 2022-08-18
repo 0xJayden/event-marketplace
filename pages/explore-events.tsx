@@ -1,20 +1,26 @@
 import { useState, useEffect } from "react";
+import { useRecoilState } from "recoil";
 import Web3 from "web3";
 import CreatedEvent from "../abis/Event.json";
 import FeedItem from "../components/Feed-Item";
 import getEventData from "../components/get-event-data";
 import Navbar from "../components/Navbar";
 import { AbiItem } from "web3-utils";
+import { modalState } from "../atoms/modalAtom";
+import Modal from "../components/Modal";
 
 interface Event {
   name: string;
   time: Date;
   address: string;
   account: string;
+  user: string;
   image: string;
   amountOfTickets: number;
   costPerTicket: number;
   description: string;
+  likes?: Array<{ account: string }>;
+  comments?: Array<{ account: string; comment: string }>;
 }
 
 export default function ExploreEvents() {
@@ -22,6 +28,7 @@ export default function ExploreEvents() {
   const [currentNetwork, setCurrentNetwork] = useState<number | null>(null);
   const [account, setAccount] = useState("");
   const [isError, setIsError] = useState(false);
+  const [openModal, setOpenModal] = useRecoilState(modalState);
 
   const loadWeb3 = async () => {
     if (typeof window.ethereum !== "undefined" && !account) {
@@ -123,7 +130,7 @@ export default function ExploreEvents() {
   return (
     <>
       <Navbar data={data} account={account} web3Handler={web3Handler} />
-
+      {openModal && <Modal account={account} />}
       <div className="flex flex-col items-center justify-center w-full">
         <div className="w-full max-w-[1000px] pt-4 pl-12 sm:pl-4">
           <h1 className="text-2xl font-bold">All events</h1>
@@ -136,11 +143,14 @@ export default function ExploreEvents() {
               time={event?.time}
               address={event?.address}
               account={event?.account}
+              user={account}
               name={event?.name}
               image={event?.image}
               amountOfTickets={event?.amountOfTickets}
               costPerTicket={event?.costPerTicket}
               description={event?.description}
+              likes={event?.likes}
+              comments={event?.comments}
             />
           ))}
         </div>

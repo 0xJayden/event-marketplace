@@ -7,9 +7,10 @@ import FeedItem from "../../components/Feed-Item";
 import CreatedEvent from "../../abis/Event.json";
 import getEventData from "../../components/get-event-data";
 import Navbar from "../../components/Navbar";
-import { modalState } from "../../atoms/modalAtom";
+import { modalState, eventNameState, eventPage } from "../../atoms/modalAtom";
 import Moment from "react-moment";
 import { TicketIcon } from "@heroicons/react/outline";
+import Modal from "../../components/Modal";
 
 export default function EventDetails() {
   const [web3, setWeb3] = useState(null);
@@ -18,6 +19,8 @@ export default function EventDetails() {
   const [isError, setIsError] = useState(null);
   const [event, setEvent] = useState(null);
   const [openModal, setOpenModal] = useRecoilState(modalState);
+  const [event_Name, setEventName] = useRecoilState(eventNameState);
+  const [isEventPage, setEventPage] = useRecoilState(eventPage);
 
   const router = useRouter();
   const { eventName } = router.query;
@@ -133,6 +136,7 @@ export default function EventDetails() {
         <title>{event?.name}</title>
       </Head>
       <Navbar data={data} account={account} web3Handler={web3Handler} />
+      {openModal && <Modal account={account} />}
       <div className="flex flex-col items-center sm:hidden">
         <FeedItem
           key={event?.name}
@@ -152,7 +156,7 @@ export default function EventDetails() {
         />
       </div>
       <div className="sm:flex justify-center pt-8 w-full hidden">
-        <div className="space-y-4">
+        <div className="space-y-8">
           <img
             className="max-h-[500px] mr-8 rounded-md border"
             src={event?.image}
@@ -191,6 +195,31 @@ export default function EventDetails() {
                 <button className="border-green-500 w-full rounded-t-none text-green-500 border-2 rounded-md p-1 px-2 max-h-[42px]">
                   Loading...
                 </button>
+              )}
+            </div>
+          </div>
+          <div className="border rounded-md">
+            <div className="flex justify-between p-2 border-b">
+              <h1 className="font-bold">Comments</h1>
+              <p
+                onClick={() => {
+                  setEventName(eventName);
+                  setEventPage(true);
+                  setOpenModal(true);
+                }}
+                className="text-gray-400 cursor-pointer"
+              >
+                Add a comment
+              </p>
+            </div>
+            <div className="p-4 flex flex-col items-center">
+              {data.events.map((event) =>
+                event.comments?.map((comment) => (
+                  <div className="space-y-2">
+                    <p className="text-gray-400 text-sm">{comment.account}</p>
+                    <p>{comment.comment}</p>
+                  </div>
+                ))
               )}
             </div>
           </div>
