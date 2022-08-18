@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import Navbar from "../../components/Navbar";
 import CreatedEvent from "../../abis/Event.json";
 import { AbiItem } from "web3-utils";
+import GetEventData from "../../components/get-event-data";
 
 export default function Profile() {
   const [web3, setWeb3] = useState<Web3 | null>(null);
@@ -18,6 +19,8 @@ export default function Profile() {
   const bannerImageInputRef = useRef<HTMLInputElement>(null);
 
   const router = useRouter();
+
+  const { data, error } = GetEventData();
 
   const loadWeb3 = async () => {
     if (typeof window.ethereum !== "undefined" && !account) {
@@ -44,11 +47,11 @@ export default function Profile() {
   };
 
   const loadBalances = async () => {
-    const result = await fetch("../api/get-events").then((res) => res.json());
+    // const result = await fetch("../api/get-events").then((res) => res.json());
     let newBalances: Array<{}> = [];
 
     if (web3)
-      result.events.map(async (e: any) => {
+      data?.events.map(async (e: any) => {
         let newEvent = new web3.eth.Contract(
           CreatedEvent.abi as AbiItem[],
           e.address
@@ -149,16 +152,18 @@ export default function Profile() {
     loadWeb3();
     loadBalances();
     loadProfileInfo();
-  }, [account]);
+  }, [account, data]);
 
   return (
     <>
-      <Navbar account={account} web3Handler={web3Handler} />
+      <div className="flex justify-center w-full">
+        <Navbar data={data} account={account} web3Handler={web3Handler} />
+      </div>
       <div className="flex justify-center w-full">
         <div className="relative sm:w-5/6 sm:max-w-[1000px]">
           <div
             onClick={() => bannerImageInputRef.current?.click()}
-            className={`h-[100px] sm:h-[200px] w-full bg-gray-100 cursor-pointer `}
+            className={`h-[100px] sm:h-[200px] w-full bg-gray-100 cursor-pointer hover:opacity-70`}
           >
             <input
               className="text-xs ml-8 w-1/2"
@@ -185,7 +190,7 @@ export default function Profile() {
           </div>
           <div
             onClick={() => imageInputRef.current?.click()}
-            className="absolute shadow-md bg-white top-[60px] sm:top-[120px] ml-4 h-[90px] sm:h-[125px] w-[90px] sm:w-[125px] rounded-full border cursor-pointer"
+            className="absolute shadow-md bg-white top-[60px] sm:top-[120px] ml-4 h-[90px] sm:h-[125px] w-[90px] sm:w-[125px] rounded-full border cursor-pointer hover:opacity-70"
           >
             <input
               className="text-xs ml-8 w-1/2"
@@ -210,18 +215,28 @@ export default function Profile() {
               Tickets
             </p>
           </div>
-          <div className="grid gap-2 grid-cols-2 m-4 justify-center items-center">
-            {balances
-              ? balances.map((e: any) => (
-                  <div
-                    key={e.name}
-                    className="flex flex-col justify-center shadow-md rounded w-full"
-                  >
-                    <div className="p-2">{e.name}</div>
-                    <img src={e.image} />
-                  </div>
-                ))
-              : "loading..."}
+          <div className="grid gap-2 sm:gap-4 grid-cols-2 m-4 justify-center items-center">
+            {balances ? (
+              balances.map((e: any) => (
+                <div
+                  onClick={() => router.push(`../events/${e.name}`)}
+                  key={e.name}
+                  className="flex flex-col justify-center shadow-md rounded w-full cursor-pointer hover:scale-105 transition duration-300 ease-in-out"
+                >
+                  <div className="p-2">{e.name}</div>
+                  <img src={e.image} />
+                </div>
+              ))
+            ) : (
+              <div className="flex h-[350px] justify-center items-center">
+                <div
+                  className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"
+                  role="status"
+                >
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

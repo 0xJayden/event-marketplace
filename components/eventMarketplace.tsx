@@ -1,13 +1,15 @@
 import { PhotographIcon } from "@heroicons/react/outline";
 import { useRouter } from "next/router";
-import getEventData from "./get-event-data";
 
-export default function EventMarketplace() {
+export default function EventMarketplace({
+  data,
+  account,
+}: {
+  data: any;
+  account: string;
+}) {
   const router = useRouter();
-  const { data, error } = getEventData();
 
-  if (error) return <div>error</div>;
-  if (!data) return <div>loading...</div>;
   return (
     <div className="flex-col text-center justify-center m-4">
       <h1 className="text-blue-500 text-6xl mb-6 mt-8">
@@ -24,7 +26,13 @@ export default function EventMarketplace() {
           Explore
         </button>
         <button
-          onClick={() => router.push("/create-event")}
+          onClick={() => {
+            if (!account) {
+              router.push("/connect");
+            } else {
+              router.push("/create-event");
+            }
+          }}
           className="py-2 px-4 border-2 border-blue-500 text-blue-500 rounded-md hover:bg-blue-500 hover:text-white transition duration-200 ease-in-out"
         >
           Create

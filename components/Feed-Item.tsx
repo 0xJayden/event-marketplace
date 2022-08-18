@@ -39,8 +39,7 @@ export default function FeedItem({
   return (
     <ul
       className={`sm:relative text-start font-light mb-2 px-4 py-2 w-5/6 sm:max-w-[300px] border rounded-lg shadow-md sm:h-[430px] ${
-        eventPage &&
-        "min-w-full max-h-screen min-h-screen rounded-none border-0"
+        eventPage && "min-w-full h-auto shadow-none rounded-none border-0"
       } sm:w-full`}
     >
       <div className="flex justify-between">
@@ -55,7 +54,10 @@ export default function FeedItem({
         onClick={() => router.push(`/events/${name}`)}
         className="flex justify-center"
       >
-        <img className="mb-2 border" src={image} />
+        <img
+          className="mb-2 cursor-pointer border hover:scale-105 transition duration-300 ease-in-out"
+          src={image}
+        />
       </li>
 
       <div className="flex justify-between">

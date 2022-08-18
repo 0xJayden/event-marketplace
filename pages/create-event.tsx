@@ -9,6 +9,7 @@ import EventCreationSuccess from "../components/EventCreationSuccess";
 import { PhotographIcon, XIcon } from "@heroicons/react/outline";
 import Navbar from "../components/Navbar";
 import { AbiItem } from "web3-utils";
+import GetEventData from "../components/get-event-data";
 
 export default function CreateEvent() {
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -207,9 +208,13 @@ export default function CreateEvent() {
     loadWeb3();
   }, [account]);
 
+  const { data, error } = GetEventData();
+
   return (
     <>
-      <Navbar account={account} web3Handler={web3Handler} />
+      <div className="flex justify-center w-full">
+        <Navbar data={data} account={account} web3Handler={web3Handler} />
+      </div>
       <div className="flex w-full justify-center">
         {isLoading ? <Loading /> : null}
         {cancelling ? <Cancelling /> : null}

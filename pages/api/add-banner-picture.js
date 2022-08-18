@@ -7,7 +7,9 @@ const handler = async (req, res) => {
     const banner = data.bannerImage;
     console.log(data);
 
-    const client = await MongoClient.connect(process.env.DB_URI);
+    const client = await MongoClient.connect(
+      `mongodb+srv://jay:${process.env.DB_PASS}@cluster0.i6d1y.mongodb.net/?retryWrites=true&w=majority`
+    );
     const db = client.db();
 
     const eventsCollection = db.collection("profiles");
@@ -19,6 +21,9 @@ const handler = async (req, res) => {
         upsert: true,
       }
     );
+
+    client.close();
+
     res.status(201).json({ message: "Profile picture added." });
   }
 };

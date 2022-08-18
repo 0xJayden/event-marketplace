@@ -5,12 +5,17 @@ const handler = async (req, res) => {
     const name = req.body.name;
     console.log(name);
 
-    const client = await MongoClient.connect(process.env.DB_URI);
+    const client = await MongoClient.connect(
+      `mongodb+srv://jay:${process.env.DB_PASS}@cluster0.i6d1y.mongodb.net/?retryWrites=true&w=majority`
+    );
     const db = client.db();
 
     const eventsCollection = db.collection("events");
 
     const result = await eventsCollection.deleteOne({ name: { $eq: name } });
+
+    client.close();
+
     res.status(201).json({ message: "Event deleted." });
   }
 };

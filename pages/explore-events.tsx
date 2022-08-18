@@ -99,12 +99,35 @@ export default function ExploreEvents() {
 
   const { data, error } = getEventData();
 
-  if (error) return "error";
-  if (!data) return "loading...";
+  if (error)
+    return (
+      <>
+        <Navbar data={data} account={account} web3Handler={web3Handler} />
+        <p>error</p>
+      </>
+    );
+  if (!data)
+    return (
+      <>
+        <Navbar data={data} account={account} web3Handler={web3Handler} />
+        <div className="flex h-[350px] justify-center items-center">
+          <div
+            className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"
+            role="status"
+          >
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </>
+    );
   return (
     <>
-      <Navbar account={account} web3Handler={web3Handler} />
-      <div className="flex justify-center w-full">
+      <Navbar data={data} account={account} web3Handler={web3Handler} />
+
+      <div className="flex flex-col items-center justify-center w-full">
+        <div className="w-full max-w-[1000px] pt-4 pl-12 sm:pl-4">
+          <h1 className="text-2xl font-bold">All events</h1>
+        </div>
         <div className="flex flex-col items-center gap-3 my-4 sm:grid-cols-4 sm:grid sm:max-w-[1000px]">
           {data.events.map((event: Event) => (
             <FeedItem

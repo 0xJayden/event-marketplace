@@ -6,9 +6,10 @@ import Web3 from "web3";
 import FeedItem from "../../components/Feed-Item";
 import CreatedEvent from "../../abis/Event.json";
 import getEventData from "../../components/get-event-data";
-import Modal from "../../components/Modal";
 import Navbar from "../../components/Navbar";
 import { modalState } from "../../atoms/modalAtom";
+import Moment from "react-moment";
+import { TicketIcon } from "@heroicons/react/outline";
 
 export default function EventDetails() {
   const [web3, setWeb3] = useState(null);
@@ -104,23 +105,35 @@ export default function EventDetails() {
 
   const { data, error } = getEventData();
 
-  if (error) return "error";
-  if (!data) return "loading...";
+  if (error)
+    return (
+      <>
+        <Navbar account={account} web3Handler={web3Handler} />
+        <p>error</p>
+      </>
+    );
+  if (!data)
+    return (
+      <>
+        <Navbar account={account} web3Handler={web3Handler} />
+        <div className="flex h-[350px] justify-center items-center">
+          <div
+            className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"
+            role="status"
+          >
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </>
+    );
 
   return (
     <div>
       <Head>
         <title>{event?.name}</title>
       </Head>
-      {openModal && <Modal account={account} />}
-      <Navbar
-        account={account}
-        // setOpenCreateEvent={setOpenCreateEvent}
-        web3Handler={web3Handler}
-        // setOpenHome={setOpenHome}
-        // setOpenExplore={setOpenExplore}
-      />
-      <div className="flex flex-col items-center sm:grid-cols-4 sm:grid">
+      <Navbar data={data} account={account} web3Handler={web3Handler} />
+      <div className="flex flex-col items-center sm:hidden">
         <FeedItem
           key={event?.name}
           mint={mint}
@@ -137,6 +150,51 @@ export default function EventDetails() {
           comments={event?.comments}
           eventPage
         />
+      </div>
+      <div className="sm:flex justify-center pt-8 w-full hidden">
+        <div className="space-y-4">
+          <img
+            className="max-h-[500px] mr-8 rounded-md border"
+            src={event?.image}
+          />
+          <div className="border rounded-md max-w-[500px]">
+            <h1 className="font-bold border-b p-2">Description</h1>
+            <p className="p-4">{event?.description}</p>
+          </div>
+        </div>
+        <div className="m-4 space-y-4">
+          <p className="font-bold text-2xl">{event?.name}</p>
+          <p>Host: {event?.account}</p>
+          <p className="text-gray-400">
+            <Moment fromNow>{event?.time}</Moment>
+          </p>
+          <div className="border rounded-md">
+            <h1 className="p-2 border-b font-bold">Ticket information</h1>
+            <div className="p-6 flex items-center justify-around">
+              <div className="flex items-center">
+                <p className="mr-2">{event?.amountOfTickets}</p>
+                <TicketIcon className="h-5 text-yellow-500" />
+              </div>
+              <div>
+                <p>{event?.costPerTicket} ETH/ticket</p>
+              </div>
+            </div>
+            <div className="flex justify-center">
+              {event?.address ? (
+                <button
+                  onClick={() => mint(event.address, event.costPerTicket, 0)}
+                  className="bg-green-500 w-full rounded-t-none text-white border border-green-500 font-normal rounded-md py-2 px-6 max-h-[42px] hover:bg-white hover:text-green-500 transition duration-500 ease-out"
+                >
+                  Mint
+                </button>
+              ) : (
+                <button className="border-green-500 w-full rounded-t-none text-green-500 border-2 rounded-md p-1 px-2 max-h-[42px]">
+                  Loading...
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

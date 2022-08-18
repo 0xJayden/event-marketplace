@@ -50,19 +50,28 @@ export default function MobileNavbar({ openMenu, web3Handler, account }: Menu) {
           </li>
         </button>
         <li
-          onClick={() => router.push(`/profile/${account}`)}
+          onClick={() => {
+            if (!account) return console.log("no account");
+            router.push(`/profile/${account}`);
+          }}
           className="flex justify-start items-center space-x-4 cursor-pointer"
         >
           <UserIcon className="h-7" />
           <p>Profile</p>
         </li>
         <li className="flex justify-center">
-          <button
-            onClick={web3Handler}
-            className="bg-blue-500 border-2 border-blue-500 text-white p-2 rounded-md hover:bg-white hover:text-blue-500 transition duration-200 ease-in-out"
-          >
-            Connect
-          </button>
+          {!account ? (
+            <button
+              onClick={web3Handler}
+              className="bg-blue-500 border-2 border-blue-500 text-white p-2 rounded-md hover:bg-white hover:text-blue-500 transition duration-200 ease-in-out"
+            >
+              Connect
+            </button>
+          ) : (
+            <button className="bg-blue-500 border-2 border-blue-500 text-white p-2 rounded-md hover:bg-white hover:text-blue-500 transition duration-200 ease-in-out">
+              Connected
+            </button>
+          )}
         </li>
       </ul>
     </div>
