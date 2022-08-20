@@ -153,7 +153,7 @@ export default function EventDetails() {
       if (
         event?.likes &&
         event?.likes?.length > 0 &&
-        event?.likes.map((l) => l.account === user)
+        event?.likes.map((l) => l.account === account)
       ) {
         setLiked(false);
         await fetch("api/remove-like", {
