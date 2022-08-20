@@ -1,10 +1,11 @@
 import { useRouter } from "next/router";
-
+import Image from "next/image";
 import Moment from "react-moment";
 import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import { modalState, eventNameState } from "../atoms/modalAtom";
 import { ChatIcon, HeartIcon, TicketIcon } from "@heroicons/react/outline";
+import eth from "../public/eth.png";
 
 interface EventItem {
   address: string;
@@ -126,15 +127,15 @@ export default function FeedItem({
 
   return (
     <ul
-      className={`sm:relative text-start font-light mb-2 px-4 py-2 w-5/6 sm:max-w-[300px] border rounded-lg shadow-md sm:h-[430px] ${
+      className={`sm:relative text-start font-light mb-2 px-4 py-2 w-5/6 sm:max-w-[300px] border rounded-lg shadow-md sm:h-[420px] ${
         eventPage && "min-w-full h-auto shadow-none rounded-none border-0"
       } sm:w-full`}
     >
-      <div className="flex justify-between">
+      <div className="flex items-center justify-between">
         <li className="sm:text-sm sm:max-w-[100px] max-w-[150px] overflow-hidden text-ellipsis pb-2">
           {account}
         </li>
-        <li className="sm:text-sm">
+        <li className="sm:text-xs">
           <Moment fromNow>{time}</Moment>
         </li>
       </div>
@@ -150,9 +151,11 @@ export default function FeedItem({
 
       <div className="flex justify-between">
         <div className="sm:max-w-[130px]">
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 mb-2">
             <HeartIcon
-              className={`h-6 ${liked && "text-red-500"}`}
+              className={`h-6 cursor-pointer ${
+                liked ? "text-red-500" : "text-gray-500"
+              }`}
               onClick={likePost}
             />
             <p>{likes?.length}</p>
@@ -161,25 +164,28 @@ export default function FeedItem({
                 setEventName(name);
                 setOpenModal(true);
               }}
-              className="h-6 pl-2"
+              className="h-6 text-gray-500 cursor-pointer pl-2"
             />
             <div>{comments?.length}</div>
           </div>
-          <li className="pb-2">{name}</li>
+          <li className="pb-2 font-medium">{name}</li>
           <p
-            className={`overflow-hidden text-[12px] max-h-[78px] sm:max-h-[40px] sm:max-w-[150px] max-w-[175px] text-ellipsis ${
+            className={`line-clamp-2 text-[12px] max-h-[78px] sm:max-h-[40px] sm:max-w-[150px] max-w-[175px] text-ellipsis ${
               eventPage && "max-h-screen max-w-[200px]"
             }`}
           >
             {description}
           </p>
         </div>
-        <div>
+        <div className="space-y-2">
           <li className="flex space-x-2 justify-end items-center">
-            <TicketIcon className="h-6 text-yellow-500" />
             <p>{amountOfTickets}</p>
+            <TicketIcon className="h-6 text-yellow-500" />
           </li>
-          <li className="sm:text-xs">Price: {costPerTicket} ETH</li>
+          <li className="flex justify-end">
+            <p className="mr-1">{costPerTicket}</p>
+            <Image width={24} height={24} src={eth} />
+          </li>
         </div>
       </div>
       <div className="flex flex-col items-end my-2"></div>
@@ -187,28 +193,24 @@ export default function FeedItem({
         <div className="flex flex-col space-y-2 mb-2 text-sm">
           <p className="font-bold">Comments</p>
           {comments?.map((comment) => (
-            <div>
-              <div className="overflow-hidden space-y-2 py-2 text-ellipsis border-b">
-                <p className="text-gray-400 text-xs">{comment.account}</p>
-                <p>{comment.comment}</p>
-              </div>
+            <div className="overflow-hidden space-y-2 py-2 text-ellipsis border-b">
+              <p className="text-gray-400 text-xs">{comment.account}</p>
+              <p>{comment.comment}</p>
             </div>
           ))}
         </div>
       )}
 
-      <div className="flex justify-center sm:absolute sm:bottom-2 sm:w-5/6">
+      <div className="flex justify-center w-full sm:absolute sm:bottom-0 sm:left-0">
         {address ? (
-          <div>
-            <button
-              onClick={getAddress}
-              className="bg-green-500 text-white border border-green-500 font-normal rounded-md py-2 px-6 max-h-[42px] hover:bg-white hover:text-green-500 transition duration-500 ease-out"
-            >
-              Mint
-            </button>
-          </div>
+          <button
+            onClick={getAddress}
+            className="bg-green-500 sm:w-full sm:rounded-t-none text-white border border-green-500 font-normal rounded-md py-2 px-6 max-h-[42px] hover:bg-white hover:text-green-500 transition duration-500 ease-out"
+          >
+            Mint
+          </button>
         ) : (
-          <button className="border-green-500 text-green-500 border-2 rounded-md p-1 px-2 max-h-[42px]">
+          <button className="border-green-500 w-full sm:rounded-t-none text-green-500 border-2 rounded-md p-1 px-2 max-h-[42px]">
             Loading...
           </button>
         )}

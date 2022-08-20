@@ -9,7 +9,7 @@ import getEventData from "../../components/get-event-data";
 import Navbar from "../../components/Navbar";
 import { modalState, eventNameState, eventPage } from "../../atoms/modalAtom";
 import Moment from "react-moment";
-import { TicketIcon } from "@heroicons/react/outline";
+import { HeartIcon, TicketIcon } from "@heroicons/react/outline";
 import Modal from "../../components/Modal";
 
 export default function EventDetails() {
@@ -21,9 +21,20 @@ export default function EventDetails() {
   const [openModal, setOpenModal] = useRecoilState(modalState);
   const [event_Name, setEventName] = useRecoilState(eventNameState);
   const [isEventPage, setEventPage] = useRecoilState(eventPage);
+  const [liked, setLiked] = useState(false);
 
   const router = useRouter();
   const { eventName } = router.query;
+
+  useEffect(() => {
+    if (event?.likes && event?.likes?.length > 0) {
+      setLiked(
+        event?.likes.findIndex(
+          (l) => l.account.toLowerCase() === account?.toLowerCase()
+        ) !== -1
+      );
+    }
+  }, [event?.likes, account]);
 
   const loadWeb3 = async () => {
     if (typeof window.ethereum !== "undefined" && !account) {
@@ -93,11 +104,84 @@ export default function EventDetails() {
   };
 
   const findEvent = () => {
-    data.events.map((event) => {
+    data?.events.map((event) => {
       if (event.name === eventName) {
         setEvent(event);
       }
     });
+  };
+
+  const likePost = async () => {
+    const body = {
+      name: eventName,
+      account: account,
+    };
+
+    if (eventPage) {
+      if (
+        event?.likes &&
+        event?.likes?.length > 0 &&
+        event?.likes.map((l) => l.account === account)
+      ) {
+        setLiked(false);
+        await fetch("../api/remove-like", {
+          method: "DELETE",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("Success:", data);
+          });
+      } else {
+        setLiked(true);
+        await fetch("../api/add-like", {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("Success:", data);
+          });
+      }
+    } else {
+      if (
+        event?.likes &&
+        event?.likes?.length > 0 &&
+        event?.likes.map((l) => l.account === user)
+      ) {
+        setLiked(false);
+        await fetch("api/remove-like", {
+          method: "DELETE",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("Success:", data);
+          });
+      } else {
+        setLiked(true);
+        await fetch("api/add-like", {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("Success:", data);
+          });
+      }
+    }
   };
 
   useEffect(() => {
@@ -155,6 +239,9 @@ export default function EventDetails() {
           eventPage
         />
       </div>
+
+      {/* Desktop view */}
+
       <div className="sm:flex justify-center pt-8 w-full hidden">
         <div className="space-y-8">
           <img
@@ -167,7 +254,23 @@ export default function EventDetails() {
           </div>
         </div>
         <div className="m-4 space-y-4">
-          <p className="font-bold text-2xl">{event?.name}</p>
+          <div className="flex items-center">
+            <p className="font-bold text-2xl mr-2">{event?.name}</p>
+            <HeartIcon
+              onClick={likePost}
+              className={`h-5 mr-1 cursor-pointer ${
+                liked ? "text-red-500" : "text-gray-500"
+              }`}
+            />
+            <p>
+              {data?.events.map((event) => {
+                if (event.name === eventName) {
+                  return event.likes?.length;
+                }
+              })}
+            </p>
+          </div>
+
           <p>Host: {event?.account}</p>
           <p className="text-gray-400">
             <Moment fromNow>{event?.time}</Moment>
@@ -200,7 +303,17 @@ export default function EventDetails() {
           </div>
           <div className="border rounded-md">
             <div className="flex justify-between p-2 border-b">
-              <h1 className="font-bold">Comments</h1>
+              <div className="flex">
+                <h1 className="font-bold mr-2">Comments </h1>
+                <p className="text-gray-500">
+                  {data.events.map((event) => {
+                    if (event.name === eventName) {
+                      return event.comments?.length;
+                    }
+                  })}
+                </p>
+              </div>
+
               <p
                 onClick={() => {
                   setEventName(eventName);
@@ -212,15 +325,19 @@ export default function EventDetails() {
                 Add a comment
               </p>
             </div>
-            <div className="p-4 flex flex-col items-center">
-              {data.events.map((event) =>
-                event.comments?.map((comment) => (
-                  <div className="space-y-2">
-                    <p className="text-gray-400 text-sm">{comment.account}</p>
-                    <p>{comment.comment}</p>
-                  </div>
-                ))
-              )}
+            <div className="p-4 space-y-2 flex flex-col items-center">
+              {data.events.map((event) => {
+                if (event.name === eventName) {
+                  return event.comments?.map((comment) => (
+                    <div className="space-y-2 w-full">
+                      <p className="text-gray-400 text-sm">
+                        {comment.account ? comment.account : "Annonymous User"}
+                      </p>
+                      <p className="border-b">{comment.comment}</p>
+                    </div>
+                  ));
+                }
+              })}
             </div>
           </div>
         </div>
