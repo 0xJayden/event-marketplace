@@ -40,9 +40,6 @@ const handler = async (req, res) => {
             },
           }
         );
-        // console.log(result.data.IpfsHash);
-
-        info.cid = result.data.IpfsHash;
 
         const jsonBody = JSON.stringify({
           pinataMetadata: {
@@ -50,7 +47,7 @@ const handler = async (req, res) => {
           },
           pinataContent: {
             name: info.name,
-            image: "ipfs://" + info.cid,
+            image: "ipfs://" + result.data.IpfsHash,
           },
         });
 
@@ -65,6 +62,8 @@ const handler = async (req, res) => {
             },
           }
         );
+
+        info.cid = jsonUpload.data.IpfsHash;
 
         // store cid from pinata result in database
         const client = await MongoClient.connect(
