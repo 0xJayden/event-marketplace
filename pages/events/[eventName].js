@@ -26,15 +26,15 @@ export default function EventDetails() {
   const router = useRouter();
   const { eventName } = router.query;
 
-  useEffect(() => {
-    if (event?.likes && event?.likes?.length > 0) {
-      setLiked(
-        event?.likes.findIndex(
-          (l) => l.account.toLowerCase() === account?.toLowerCase()
-        ) !== -1
-      );
-    }
-  }, [event?.likes, account]);
+  // useEffect(() => {
+  //   if (event?.likes && event?.likes?.length > 0) {
+  //     setLiked(
+  //       event?.likes.findIndex(
+  //         (l) => l.account.toLowerCase() === account?.toLowerCase()
+  //       ) !== -1
+  //     );
+  //   }
+  // }, [event?.likes, account]);
 
   const loadWeb3 = async () => {
     if (typeof window.ethereum !== "undefined" && !account) {
@@ -111,78 +111,78 @@ export default function EventDetails() {
     });
   };
 
-  const likePost = async () => {
-    const body = {
-      name: eventName,
-      account: account,
-    };
+  // const likePost = async () => {
+  //   const body = {
+  //     name: eventName,
+  //     account: account,
+  //   };
 
-    if (eventPage) {
-      if (
-        event?.likes &&
-        event?.likes?.length > 0 &&
-        event?.likes.map((l) => l.account === account)
-      ) {
-        setLiked(false);
-        await fetch("../api/remove-like", {
-          method: "DELETE",
-          body: JSON.stringify(body),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            console.log("Success:", data);
-          });
-      } else {
-        setLiked(true);
-        await fetch("../api/add-like", {
-          method: "POST",
-          body: JSON.stringify(body),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            console.log("Success:", data);
-          });
-      }
-    } else {
-      if (
-        event?.likes &&
-        event?.likes?.length > 0 &&
-        event?.likes.map((l) => l.account === account)
-      ) {
-        setLiked(false);
-        await fetch("api/remove-like", {
-          method: "DELETE",
-          body: JSON.stringify(body),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            console.log("Success:", data);
-          });
-      } else {
-        setLiked(true);
-        await fetch("api/add-like", {
-          method: "POST",
-          body: JSON.stringify(body),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            console.log("Success:", data);
-          });
-      }
-    }
-  };
+  //   if (eventPage) {
+  //     if (
+  //       event?.likes &&
+  //       event?.likes?.length > 0 &&
+  //       event?.likes.map((l) => l.account === account)
+  //     ) {
+  //       setLiked(false);
+  //       await fetch("../api/remove-like", {
+  //         method: "DELETE",
+  //         body: JSON.stringify(body),
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       })
+  //         .then((res) => res.json())
+  //         .then((data) => {
+  //           console.log("Success:", data);
+  //         });
+  //     } else {
+  //       setLiked(true);
+  //       await fetch("../api/add-like", {
+  //         method: "POST",
+  //         body: JSON.stringify(body),
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       })
+  //         .then((res) => res.json())
+  //         .then((data) => {
+  //           console.log("Success:", data);
+  //         });
+  //     }
+  //   } else {
+  //     if (
+  //       event?.likes &&
+  //       event?.likes?.length > 0 &&
+  //       event?.likes.map((l) => l.account === account)
+  //     ) {
+  //       setLiked(false);
+  //       await fetch("api/remove-like", {
+  //         method: "DELETE",
+  //         body: JSON.stringify(body),
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       })
+  //         .then((res) => res.json())
+  //         .then((data) => {
+  //           console.log("Success:", data);
+  //         });
+  //     } else {
+  //       setLiked(true);
+  //       await fetch("api/add-like", {
+  //         method: "POST",
+  //         body: JSON.stringify(body),
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       })
+  //         .then((res) => res.json())
+  //         .then((data) => {
+  //           console.log("Success:", data);
+  //         });
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
     loadWeb3();
@@ -256,7 +256,7 @@ export default function EventDetails() {
         <div className="m-4 space-y-4">
           <div className="flex items-center">
             <p className="font-bold text-2xl mr-2">{event?.name}</p>
-            <HeartIcon
+            {/* <HeartIcon
               onClick={likePost}
               className={`h-5 mr-1 cursor-pointer ${
                 liked ? "text-red-500" : "text-gray-500"
@@ -268,7 +268,7 @@ export default function EventDetails() {
                   return event.likes?.length;
                 }
               })}
-            </p>
+            </p> */}
           </div>
 
           <p>Host: {event?.account}</p>
