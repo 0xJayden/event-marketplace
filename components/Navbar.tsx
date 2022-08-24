@@ -116,14 +116,14 @@ export default function Navbar({ web3Handler, account, data }: Navbar) {
                 router.push(`/profile/${account}`);
               }
             }}
-            className="hidden cursor-pointer sm:inline"
+            className="hidden h-6 w-6 rounded-full overflow-hidden cursor-pointer sm:inline"
           >
-            {!account && !pfp ? (
+            {!pfp ? (
               <p>
-                <UserCircleIcon className="h-5" />
+                <UserCircleIcon className="h-6" />
               </p>
             ) : (
-              <img className="h-6 rounded-full" src={pfp} />
+              <img src={pfp} />
             )}
           </li>
         </ul>

@@ -5,15 +5,15 @@ import Navbar from "../../components/Navbar";
 import CreatedEvent from "../../abis/Event.json";
 import { AbiItem } from "web3-utils";
 import GetEventData from "../../components/get-event-data";
+import { PencilIcon, UserIcon } from "@heroicons/react/outline";
 
 export default function Profile() {
   const [web3, setWeb3] = useState<Web3 | null>(null);
   const [account, setAccount] = useState("");
   const [balances, setBalances] = useState<Array<{}>>();
   const [pfp, setPfp] = useState<string>();
-  const [isPfpSelected, setIsPfpSelected] = useState(false);
   const [banner, setBanner] = useState<string>();
-  const [isBannerSelected, setIsBannerSelected] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
   const imageInputRef = useRef<HTMLInputElement>(null);
   const bannerImageInputRef = useRef<HTMLInputElement>(null);
@@ -47,22 +47,28 @@ export default function Profile() {
   };
 
   const loadBalances = async () => {
-    // const result = await fetch("../api/get-events").then((res) => res.json());
+    setLoading(true);
     let newBalances: Array<{}> = [];
 
-    if (web3)
-      data?.events.map(async (e: any) => {
-        let newEvent = new web3.eth.Contract(
-          CreatedEvent.abi as AbiItem[],
-          e.address
-        );
+    try {
+      if (web3)
+        data?.events.map(async (e: any) => {
+          let newEvent = new web3.eth.Contract(
+            CreatedEvent.abi as AbiItem[],
+            e.address
+          );
 
-        let balance = await newEvent.methods.balanceOf(account, 0).call();
-        if (balance > 0) {
-          newBalances.push(e);
-          setBalances(newBalances);
-        }
-      });
+          let balance = await newEvent.methods.balanceOf(account, 0).call();
+          if (balance > 0) {
+            newBalances.push(e);
+            setBalances(newBalances);
+          }
+        });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const web3Handler = async () => {
@@ -90,7 +96,6 @@ export default function Profile() {
       )
         return;
       setPfp(e.target.result);
-      setIsPfpSelected(true);
       const body = {
         pfpImage: e.target.result,
         account: account,
@@ -121,7 +126,6 @@ export default function Profile() {
       )
         return;
       setBanner(e.target.result);
-      setIsBannerSelected(true);
       const body = {
         bannerImage: e.target.result,
         account: account,
@@ -163,7 +167,7 @@ export default function Profile() {
         <div className="relative sm:w-5/6 sm:max-w-[1000px]">
           <div
             onClick={() => bannerImageInputRef.current?.click()}
-            className={`h-[100px] sm:h-[200px] w-full bg-gray-100 cursor-pointer hover:opacity-70`}
+            className={`h-[100px] overflow-hidden sm:h-[200px] w-full bg-gray-100 cursor-pointer hover:opacity-70`}
           >
             <input
               className="text-xs ml-8 w-1/2"
@@ -175,22 +179,17 @@ export default function Profile() {
               ref={bannerImageInputRef}
               hidden
             ></input>
-            {banner && !isBannerSelected && (
-              <img
-                className="w-fit max-h-[100px] sm:max-h-[200px]"
-                src={banner}
-              />
-            )}
-            {isBannerSelected && (
-              <img
-                className="w-fit max-h-[100px] sm:max-h-[200px]"
-                src={banner}
-              />
+            {banner ? (
+              <img src={banner} />
+            ) : (
+              <div className="flex h-full justify-center items-center opacity-0 hover:opacity-100">
+                <PencilIcon className="h-7 text-gray-500" />
+              </div>
             )}
           </div>
           <div
             onClick={() => imageInputRef.current?.click()}
-            className="absolute shadow-md bg-white top-[60px] sm:top-[120px] ml-4 h-[90px] sm:h-[125px] w-[90px] sm:w-[125px] rounded-full border cursor-pointer hover:opacity-70"
+            className="absolute overflow-hidden shadow-md bg-white top-[60px] sm:top-[120px] ml-4 h-[90px] sm:h-[125px] w-[90px] sm:w-[125px] rounded-full border cursor-pointer hover:opacity-70"
           >
             <input
               className="text-xs ml-8 w-1/2"
@@ -202,8 +201,13 @@ export default function Profile() {
               ref={imageInputRef}
               hidden
             ></input>
-            {pfp && <img className="rounded-full" src={pfp} />}
-            {isPfpSelected && <img className="rounded-full" src={pfp} />}
+            {pfp ? (
+              <img src={pfp} />
+            ) : (
+              <div className="flex h-full justify-center items-center">
+                <UserIcon className="h-20 text-gray-400" />
+              </div>
+            )}
           </div>
           <div className="mt-20 ml-4 max-w-[200px]">
             <p className="text-xl font-bold overflow-hidden text-ellipsis hover:underline cursor-pointer">
@@ -227,7 +231,7 @@ export default function Profile() {
                   <img src={e.image} />
                 </div>
               ))
-            ) : (
+            ) : isLoading ? (
               <div className="flex h-[350px] justify-center items-center">
                 <div
                   className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"
@@ -236,6 +240,8 @@ export default function Profile() {
                   <span className="visually-hidden">Loading...</span>
                 </div>
               </div>
+            ) : (
+              <p>No purchased tickets yet.</p>
             )}
           </div>
         </div>
