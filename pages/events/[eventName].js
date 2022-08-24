@@ -21,7 +21,7 @@ export default function EventDetails() {
   const [openModal, setOpenModal] = useRecoilState(modalState);
   const [event_Name, setEventName] = useRecoilState(eventNameState);
   const [isEventPage, setEventPage] = useRecoilState(eventPage);
-  const [liked, setLiked] = useState(false);
+  // const [liked, setLiked] = useState(false);
 
   const router = useRouter();
   const { eventName } = router.query;

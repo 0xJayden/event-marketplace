@@ -378,7 +378,7 @@
         1763
       ],
       "ERC165": [
-        2119
+        2193
       ],
       "IERC1155": [
         1565
@@ -390,7 +390,7 @@
         1606
       ],
       "IERC165": [
-        2131
+        2205
       ]
     },
     "id": 1764,
@@ -452,8 +452,8 @@
           1443,
           1778,
           1565,
-          2119,
-          2131,
+          2193,
+          2205,
           2095
         ],
         "name": "ERC1155Supply",
@@ -2309,7 +2309,7 @@
         1763
       ],
       "ERC165": [
-        2119
+        2193
       ],
       "IERC1155": [
         1565
@@ -2321,7 +2321,7 @@
         1606
       ],
       "IERC165": [
-        2131
+        2205
       ]
     },
     "id": 1764,
@@ -2383,8 +2383,8 @@
           1443,
           1778,
           1565,
-          2119,
-          2131,
+          2193,
+          2205,
           2095
         ],
         "name": "ERC1155Supply",
@@ -4230,7 +4230,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.6",
-  "updatedAt": "2022-08-02T02:31:49.533Z",
+  "updatedAt": "2022-08-23T22:04:52.541Z",
   "devdoc": {
     "details": "Extension of ERC1155 that adds tracking of total supply per id. Useful for scenarios where Fungible and Non-fungible tokens have to be clearly identified. Note: While a totalSupply of 1 might mean the corresponding is an NFT, there is no guarantees that no other token with the same id are not going to be minted.",
     "kind": "dev",

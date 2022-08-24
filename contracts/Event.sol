@@ -16,6 +16,8 @@ contract Event is Ownable, Pausable, ERC1155, ERC1155Supply{
     uint256 amountOfTickets;
     uint256 costPerTicket;
 
+    event Mint(uint256 indexed id, address indexed account, uint256 amount);
+
     constructor(
         string memory _name,
         string memory _uri,
@@ -62,6 +64,7 @@ contract Event is Ownable, Pausable, ERC1155, ERC1155Supply{
             _tokenSupply.increment();
         }
         _mint(msg.sender, 0, _amount, " ");
+        emit Mint(_id, msg.sender, _amount);
     }
 
     function ticketsMinted() public view returns (uint256) {
@@ -77,15 +80,16 @@ contract Event is Ownable, Pausable, ERC1155, ERC1155Supply{
 }
 
 contract CreateEvent {
-    Event[] public events;
+
+    event EventCreated(string indexed name, uint256 amountOfTickets, uint256 costPerTicket);
 
     function create(
         string memory _name,
         string memory _uri,
         uint256 _amountTickets,
         uint256 _costPerTicket) public {
-        Event e = new Event(_name, _uri, _amountTickets, _costPerTicket);
-        events.push(e);
+        new Event(_name, _uri, _amountTickets, _costPerTicket);
+        emit EventCreated(_name, _amountTickets, _costPerTicket);
     }
 
 }
