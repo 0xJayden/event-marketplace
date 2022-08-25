@@ -1,7 +1,16 @@
 import { TicketIcon } from "@heroicons/react/outline";
 import { useRouter } from "next/router";
 
-export default function SearchResults({ searchResults }) {
+export default function SearchResults({
+  searchResults,
+}: {
+  searchResults: Array<{
+    name: string;
+    image: string;
+    amountOfTickets: number;
+    costPerTicket: number;
+  }>;
+}) {
   const router = useRouter();
 
   return (

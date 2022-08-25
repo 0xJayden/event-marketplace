@@ -1,8 +1,8 @@
-export default function Loading() {
+export default function Cancelling() {
   return (
     <div className="flex flex-col fixed z-10 inset-0 justify-center items-center backdrop-blur-md backdrop-brightness-75">
       <div className="flex text-xl flex-col items-center bg-white py-8 px-8 sm:px-16 rounded shadow-md">
-        <p>Submitting event info...</p>
+        <p>Cancelling...</p>
         <p>Please do not leave the page.</p>
         <div className="flex mt-4 justify-center items-center">
           <div

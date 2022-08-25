@@ -1,5 +1,19 @@
 import { ArrowLeftIcon } from "@heroicons/react/outline";
+import { BaseSyntheticEvent, Dispatch, SetStateAction } from "react";
 import SearchResults from "./SearchResults";
+
+interface MobileSearchBar {
+  openSearch: boolean;
+  setOpenSearch: Dispatch<SetStateAction<boolean>>;
+  handleSearch: (e: BaseSyntheticEvent) => void;
+  setSearchResults: Dispatch<SetStateAction<never[]>>;
+  searchResults: Array<{
+    name: string;
+    image: string;
+    amountOfTickets: number;
+    costPerTicket: number;
+  }>;
+}
 
 export default function MobileSearchBar({
   openSearch,
@@ -7,7 +21,7 @@ export default function MobileSearchBar({
   handleSearch,
   setSearchResults,
   searchResults,
-}) {
+}: MobileSearchBar) {
   return (
     <div
       className={`fixed flex items-center top-0 w-full z-30 ${
