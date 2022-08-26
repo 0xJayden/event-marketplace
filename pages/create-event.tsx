@@ -174,7 +174,6 @@ export default function CreateEvent() {
             .on("error", (error: Error) => {
               console.log(error);
               setConfirming(false);
-              setEventPlaced(false);
             });
         } else {
           console.log("no matching events");
