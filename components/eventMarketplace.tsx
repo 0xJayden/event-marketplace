@@ -11,32 +11,40 @@ export default function EventMarketplace({
   const router = useRouter();
 
   return (
-    <div className="flex-col text-center justify-center m-4">
-      <h1 className="text-blue-500 text-6xl mb-6 mt-8">
-        An Event Market Place
-      </h1>
-      <p className="mb-6">
-        A unique, exciting way to book & host events powered by the blockchain.
-      </p>
-      <div className="flex justify-center space-x-4">
-        <button
-          onClick={() => router.push("/explore-events")}
-          className="py-2 px-4 bg-black border-2 border-black text-white rounded-md hover:bg-white hover:text-black transition duration-200 ease-in-out"
-        >
-          Explore
-        </button>
-        <button
-          onClick={() => {
-            if (!account) {
-              router.push("/connect");
-            } else {
-              router.push("/create-event");
-            }
-          }}
-          className="py-2 px-4 border-2 border-blue-500 text-blue-500 rounded-md hover:bg-blue-500 hover:text-white transition duration-200 ease-in-out"
-        >
-          Create
-        </button>
+    <div className="text-center justify-center m-4">
+      <div className="relative">
+        <h1 className="text-blue-500 text-6xl mb-6 mt-8">
+          An Event Market Place
+        </h1>
+        <p className="mb-6">
+          A unique, exciting way to book & host events powered by the
+          blockchain.
+        </p>
+        <div className="flex justify-center space-x-4">
+          <button
+            onClick={() => router.push("/explore-events")}
+            className="py-2 px-4 bg-black border-2 border-black text-white rounded-md hover:bg-white hover:text-black transition duration-200 ease-in-out"
+          >
+            Explore
+          </button>
+          <button
+            onClick={() => {
+              if (!account) {
+                router.push("/connect");
+              } else {
+                router.push("/create-event");
+              }
+            }}
+            className="py-2 px-4 border-2 border-blue-500 text-blue-500 rounded-md hover:bg-blue-500 hover:text-white transition duration-200 ease-in-out"
+          >
+            Create
+          </button>
+        </div>
+      </div>
+
+      <div className="absolute overflow-hidden -z-20 inset-0 opacity-50">
+        <img className="w-full" src={data.events[0].image} />
+        <div className="absolute inset-0 backdrop-blur-lg"></div>
       </div>
       <div className="flex flex-col w-full items-center justify-center mt-8 sm:mt-32">
         <p className="mb-4">Featured Event</p>
