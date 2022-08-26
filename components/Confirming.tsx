@@ -1,6 +1,6 @@
 export default function Confirming() {
   return (
-    <div className="flex flex-col fixed z-10 inset-0 justify-center items-center backdrop-blur-md backdrop-brightness-75">
+    <div className="flex flex-col fixed z-20 inset-0 justify-center items-center backdrop-blur-md">
       <div className="flex text-xl flex-col items-center bg-white py-8 px-8 sm:px-16 rounded shadow-md">
         <p>Confirming...</p>
         <p>This may take up to 15s</p>

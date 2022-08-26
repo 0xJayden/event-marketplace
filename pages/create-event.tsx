@@ -136,12 +136,14 @@ export default function CreateEvent() {
 
       for (let i = 0; result.events.length > i; i++) {
         if (result.events[i].name === eventName) {
+          const cost = result.events[i].costPerTicket;
+          const costToWei = web3.utils.toWei(cost, "ether");
           await newEvent.methods
             .create(
               result.events[i].name,
               result.events[i].cid,
               result.events[i].amountOfTickets,
-              result.events[i].costPerTicket
+              costToWei
             )
             .send({ from: account, value: 0 })
             .on(
@@ -168,7 +170,12 @@ export default function CreateEvent() {
                 setSuccess(true);
                 setEventPlaced(false);
               }
-            );
+            )
+            .on("error", (error: Error) => {
+              console.log(error);
+              setConfirming(false);
+              setEventPlaced(false);
+            });
         } else {
           console.log("no matching events");
         }
@@ -177,6 +184,7 @@ export default function CreateEvent() {
   };
 
   const cancel = async () => {
+    setConfirming(false);
     setCancelling(true);
     const result = await fetch("api/get-events").then((res) => res.json());
 
