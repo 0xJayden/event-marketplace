@@ -232,7 +232,7 @@ export default function CreateEvent() {
             <h1 className="text-4xl font-bold my-4">Create Event</h1>
           </div>
           <div className="flex items-start w-5/6 sm:w-auto text-sm mb-4">
-            <p>
+            <p className="text-gray-700">
               <span className=" text-red-500">*</span> Required Fields
             </p>
           </div>
@@ -242,7 +242,7 @@ export default function CreateEvent() {
             onSubmit={submitHandler}
             id="eventCreate"
           >
-            <div className="flex">
+            <div className="flex font-bold">
               <p>Name</p>
               <span className=" text-red-500 ml-1">*</span>
             </div>
@@ -253,7 +253,7 @@ export default function CreateEvent() {
               placeholder="Name of Event"
               ref={nameInputRef}
             ></input>
-            <div className="flex">
+            <div className="flex font-bold">
               <p>Amount of Tickets</p>
               <span className=" text-red-500 ml-1">*</span>
             </div>
@@ -265,7 +265,7 @@ export default function CreateEvent() {
               placeholder="Amount"
               ref={amountOfTicketsInputRef}
             ></input>
-            <div className="flex">
+            <div className="flex font-bold">
               <p>Cost per Ticket</p>
               <span className=" text-red-500 ml-1">*</span>
             </div>
@@ -276,7 +276,7 @@ export default function CreateEvent() {
               placeholder="Cost"
               ref={costPerTicketInputRef}
             ></input>
-            <div className="flex">
+            <div className="flex font-bold">
               <p>Select Image</p>
               <span className=" text-red-500 ml-1">*</span>
             </div>
@@ -312,7 +312,7 @@ export default function CreateEvent() {
                 />
               </div>
             ) : null}
-            <div className="flex">
+            <div className="flex font-bold">
               <p>Describe the event</p>
               <span className=" text-red-500 ml-1">*</span>
             </div>
@@ -328,7 +328,7 @@ export default function CreateEvent() {
 
             <div className="flex justify-end">
               <button
-                className="p-2 sm:p-4 border-2 w-1/4 sm:max-w-[150px] border-black rounded-md hover:bg-black hover:text-white transition duration-200 ease-out"
+                className="font-bold p-2 sm:p-4 border-2 w-1/4 sm:max-w-[150px] border-black rounded-md hover:bg-black hover:text-white transition duration-200 ease-out"
                 type="submit"
               >
                 Submit

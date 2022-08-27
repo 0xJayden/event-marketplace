@@ -17,7 +17,7 @@ export default function MobileNavbar({ openMenu, web3Handler, account }: Menu) {
 
   return (
     <div
-      className={`flex fixed z-10 right-0 border-l shadow-md bg-white bottom-0 top-[60px] py-2 px-4 ${
+      className={`flex fixed z-10 right-0 border-l shadow-md bg-white bottom-0 top-[60px] py-2 px-4 text-gray-700 font-bold ${
         openMenu
           ? "opacity-100 transition duration-500 ease-out"
           : "opacity-0 translate-x-full transition duration-500 ease-out"

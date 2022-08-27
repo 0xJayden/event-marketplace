@@ -69,7 +69,7 @@ export default function Navbar({ web3Handler, account, data }: Navbar) {
             )}
           </div>
         </div>
-        <ul className="flex items-center justify-end mr-4 sm:justify-between sm:min-w-[300px] sm:max-w-[400px]">
+        <ul className="flex items-center justify-end mr-4 text-gray-700 font-semibold sm:justify-between sm:min-w-[300px] sm:max-w-[400px]">
           <SearchIcon
             onClick={() => setOpenSearch(true)}
             className="h-7 mr-6 sm:hidden"

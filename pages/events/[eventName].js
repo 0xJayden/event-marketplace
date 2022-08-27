@@ -250,7 +250,7 @@ export default function EventDetails() {
           />
           <div className="border rounded-md max-w-[500px]">
             <h1 className="font-bold border-b p-2">Description</h1>
-            <p className="p-4">{event?.description}</p>
+            <p className="p-4 text-gray-700">{event?.description}</p>
           </div>
         </div>
         <div className="m-4 space-y-4">
@@ -271,7 +271,7 @@ export default function EventDetails() {
             </p> */}
           </div>
 
-          <p>Host: {event?.account}</p>
+          <p className="text-gray-700">Host: {event?.account}</p>
           <p className="text-gray-400">
             <Moment fromNow>{event?.time}</Moment>
           </p>
@@ -333,7 +333,9 @@ export default function EventDetails() {
                       <p className="text-gray-400 text-sm">
                         {comment.account ? comment.account : "Annonymous User"}
                       </p>
-                      <p className="border-b">{comment.comment}</p>
+                      <p className="border-b text-gray-700">
+                        {comment.comment}
+                      </p>
                     </div>
                   ));
                 }

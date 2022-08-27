@@ -150,7 +150,7 @@ export default function FeedItem({
       </li>
 
       <div className="flex justify-between">
-        <div className="sm:max-w-[130px]">
+        <div className="sm:max-w-[150px]">
           <div className="flex space-x-2 mb-2">
             <HeartIcon
               className={`h-6 cursor-pointer ${
@@ -170,7 +170,7 @@ export default function FeedItem({
           </div>
           <li className="pb-2 font-medium">{name}</li>
           <p
-            className={`line-clamp-2 text-[12px] max-h-[78px] sm:max-h-[40px] sm:max-w-[150px] max-w-[175px] text-ellipsis ${
+            className={`line-clamp-2 text-gray-700 text-[12px] max-h-[78px] sm:max-h-[40px] sm:max-w-[150px] max-w-[175px] text-ellipsis ${
               eventPage && "max-h-screen max-w-[200px]"
             }`}
           >
@@ -188,7 +188,6 @@ export default function FeedItem({
           </li>
         </div>
       </div>
-      <div className="flex flex-col items-end my-2"></div>
       {eventPage && (
         <div className="flex flex-col space-y-2 mb-2 text-sm">
           <p className="font-bold">Comments</p>
@@ -201,11 +200,11 @@ export default function FeedItem({
         </div>
       )}
 
-      <div className="flex justify-center w-full sm:absolute sm:bottom-0 sm:left-0">
+      <div className="flex justify-center w-full mt-2 sm:absolute sm:bottom-0 sm:left-0">
         {address ? (
           <button
             onClick={getAddress}
-            className="bg-green-500 sm:w-full sm:rounded-t-none text-white border border-green-500 font-normal rounded-md py-2 px-6 max-h-[42px] hover:bg-white hover:text-green-500 transition duration-500 ease-out"
+            className="bg-green-500 sm:w-full sm:rounded-t-none text-white border border-green-500 font-bold rounded-md py-2 px-6 max-h-[42px] hover:bg-white hover:text-green-500 transition duration-500 ease-out"
           >
             Mint
           </button>
