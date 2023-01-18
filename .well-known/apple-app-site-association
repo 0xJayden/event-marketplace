@@ -1,13 +1,21 @@
 {
-    "applinks": {
-        "details": [
-            {
-                "appIDs": [],
-                "components": []
-            }
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "7JVV3AM226.org.reactjs.native.example.SocializeApp"
+        ],
+        "components": [
+          {
+            "/": "/verified/*"
+          }
         ]
-    },
-    "webcredentials": {
-        "apps": []
-    }
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "7JVV3AM226.org.reactjs.native.example.SocializeApp"
+    ]
+  }
 }
