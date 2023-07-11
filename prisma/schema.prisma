@@ -45,11 +45,13 @@ model User {
     emailVerified DateTime?
     image         String?
     name          String?
+    bio           String?
     createdAt     DateTime  @default(now())
     wallet        Wallet?
     accounts      Account[]
     sessions      Session[]
-    event         Event[]
+    events        Event[]
+    tickets       Ticket[]
     likes         Like[]
     comments      Comment[]
     followers     User[]    @relation(name: "Followers")
@@ -62,6 +64,17 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Ticket {
+    id      String @id @default(uuid())
+    userId  String
+    eventId String
+    user    User   @relation(fields: [userId], references: [id])
+    event   Event  @relation(fields: [eventId], references: [id])
+
+    @@index([userId], name: "userId")
+    @@index([eventId], name: "eventId")
 }
 
 model Event {
@@ -78,6 +91,7 @@ model Event {
     user            User      @relation(fields: [userId], references: [id])
     likes           Like[]
     comments        Comment[]
+    tickets         Ticket[]
 
     @@index([userId], name: "userId")
 }

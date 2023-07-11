@@ -2,17 +2,26 @@ import { useState, useEffect, useRef, BaseSyntheticEvent } from "react";
 import { useRouter } from "next/router";
 import { AbiItem } from "web3-utils";
 import { PencilIcon, UserIcon } from "@heroicons/react/outline";
+import { Cairo } from "next/font/google";
 
 import CreatedEvent from "../../../abis/Event.json";
 import Navbar from "../../components/Navbar";
 import { useWeb3 } from "../../hooks/useWeb3";
 import { useWallet } from "../../hooks/useWallet";
+import { trpc } from "../../utils/trpc";
+import { on } from "events";
+import Image from "next/image";
+
+const cairo = Cairo({ subsets: ["latin"] });
 
 export default function Profile() {
   const [balances, setBalances] = useState<Array<{}>>();
   const [pfp, setPfp] = useState<string>();
   const [banner, setBanner] = useState<string>();
   const [isLoading, setLoading] = useState(false);
+  const [onTickets, setOnTickets] = useState(true);
+  const [onEvents, setOnEvents] = useState(false);
+  const [onLikes, setOnLikes] = useState(false);
 
   const imageInputRef = useRef<HTMLInputElement>(null);
   const bannerImageInputRef = useRef<HTMLInputElement>(null);
@@ -21,7 +30,19 @@ export default function Profile() {
 
   const { account, web3 } = useWeb3();
 
-  const { address } = useWallet();
+  // const { address } = useWallet();
+
+  const { data } = trpc.user.getUserWithTickets.useQuery(undefined, {
+    enabled: !!onTickets,
+  });
+
+  const { data: events } = trpc.user.getUserWithEvents.useQuery(undefined, {
+    enabled: !!onEvents,
+  });
+
+  const { data: likes } = trpc.user.getUserWithLikes.useQuery(undefined, {
+    enabled: !!onLikes,
+  });
 
   // const loadBalances = async () => {
   //   setLoading(true);
@@ -129,11 +150,14 @@ export default function Profile() {
       <div className="flex justify-center w-full">
         <Navbar />
       </div>
-      <div className="flex text-slate-200 bg-slate-800 min-h-screen justify-center w-full">
-        <div className="relative sm:w-5/6 sm:max-w-[1000px]">
+      <div
+        style={cairo.style}
+        className="flex text-slate-200 bg-slate-800 min-h-screen justify-center w-full"
+      >
+        <div className="relative w-full sm:w-5/6 sm:max-w-[1000px]">
           <div
             onClick={() => bannerImageInputRef.current?.click()}
-            className={`h-[100px] overflow-hidden sm:h-[200px] w-full bg-slate-600 cursor-pointer hover:opacity-70`}
+            className={`h-[100px] overflow-hidden sm:h-[200px] animate-pulse w-full bg-slate-600 cursor-pointer hover:opacity-70`}
           >
             <input
               className="text-xs ml-8 w-1/2"
@@ -148,14 +172,14 @@ export default function Profile() {
             {banner ? (
               <img src={banner} />
             ) : (
-              <div className="flex h-full justify-center items-center opacity-0 hover:opacity-100">
-                <PencilIcon className="h-7 text-gray-500" />
+              <div className="flex h-full justify-center items-center">
+                {/* <PencilIcon className="h-7 text-gray-200" /> */}
               </div>
             )}
           </div>
           <div
             onClick={() => imageInputRef.current?.click()}
-            className="absolute overflow-hidden shadow-md bg-slate-700 border-slate-600 top-[60px] sm:top-[120px] ml-4 h-[90px] sm:h-[125px] w-[90px] sm:w-[125px] rounded-full border cursor-pointer hover:opacity-70"
+            className="absolute overflow-hidden shadow-md bg-slate-700 border-slate-600 top-[60px] sm:top-[120px] ml-2 h-[90px] sm:h-[125px] w-[90px] sm:w-[125px] rounded-full border cursor-pointer hover:opacity-70"
           >
             <input
               className="text-xs ml-8 w-1/2"
@@ -175,17 +199,122 @@ export default function Profile() {
               </div>
             )}
           </div>
-          <div className="mt-20 ml-4 max-w-[200px]">
-            <p className="text-xl font-bold overflow-hidden text-ellipsis hover:underline cursor-pointer">
+          <div className="mt-[55px] ml-4 max-w-[200px]">
+            {/* <p className="text-xl font-bold overflow-hidden text-ellipsis hover:underline cursor-pointer">
               {account ? account : address}
-            </p>
+            </p> */}
+            <p className="text-2xl font-bold">{data?.userWithTickets?.name}</p>
           </div>
-          <div className="mx-4 mt-10 border-b">
-            <p className="font-semibold underline underline-offset-4">
+          {data?.userWithTickets?.bio ? (
+            <p className="ml-4">{data.userWithTickets.bio}</p>
+          ) : (
+            <button className="text-slate-500 ml-4">Create Bio</button>
+          )}
+          <div className="flex space-x-2 ml-4 my-2">
+            <p>{data?.userWithTickets?.following.length} Following</p>
+            <p>{data?.userWithTickets?.followers.length} Followers</p>
+          </div>
+          <div className="mx-4 flex justify-between border-b border-b-slate-700">
+            <p
+              className={`w-fit cursor-pointer ${
+                onTickets && "border-orange-500 border-b-2"
+              }`}
+              onClick={() => {
+                setOnTickets(true);
+                setOnEvents(false);
+                setOnLikes(false);
+              }}
+            >
               Tickets
             </p>
+            <p
+              className={`w-fit cursor-pointer ${
+                onEvents && "border-orange-500 border-b-2"
+              }`}
+              onClick={() => {
+                setOnTickets(false);
+                setOnEvents(true);
+                setOnLikes(false);
+              }}
+            >
+              Events
+            </p>
+            <p
+              className={`w-fit cursor-pointer ${
+                onLikes && "border-orange-500 border-b-2"
+              }`}
+              onClick={() => {
+                setOnLikes(true);
+                setOnEvents(false);
+                setOnTickets(false);
+              }}
+            >
+              Likes
+            </p>
           </div>
-          <div className="grid gap-2 sm:gap-4 grid-cols-2 m-4 justify-center items-center">
+          <div>
+            {onTickets ? (
+              <div className="grid gap-2 sm:gap-4 grid-cols-2 m-4 justify-center items-center">
+                {data?.userWithTickets?.tickets &&
+                data.userWithTickets.tickets.length > 0
+                  ? data?.userWithTickets?.tickets.map((e: any) => (
+                      <div
+                        onClick={() => router.push(`../tickets/${e.name}`)}
+                        key={e.name}
+                        className="flex flex-col justify-center shadow-md rounded w-full cursor-pointer hover:scale-105 transition duration-300 ease-in-out"
+                      >
+                        <div className="p-2">{e.name}</div>
+                        <img src={e.image} />
+                      </div>
+                    ))
+                  : "No Tickets yet."}
+              </div>
+            ) : onEvents ? (
+              <div className="grid gap-2 sm:gap-4 grid-cols-2 m-4 justify-center items-center">
+                {events?.userWithEvents?.events.map((e: any) => (
+                  <div
+                    onClick={() => router.push(`../events/${e.id}`)}
+                    key={e.name}
+                    className="flex relative flex-col justify-center shadow-md rounded-lg w-full cursor-pointer hover:scale-105 transition duration-300 ease-in-out"
+                  >
+                    <Image
+                      alt=""
+                      className="w-full rounded-lg h-full object-cover cursor-pointer hover:scale-105 transition duration-300 ease-in-out"
+                      src={`https://gateway.pinata.cloud/ipfs/${e.cid}`}
+                      width={300}
+                      height={200}
+                    />
+                    <div className="absolute rounded-b-lg backdrop-brightness-50 w-full bottom-0 p-2">
+                      {e.name}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : onLikes ? (
+              <div className="grid gap-2 sm:gap-4 grid-cols-2 m-4 justify-center items-center">
+                {likes?.userWithLikes?.likes.map((e: any) => (
+                  <div
+                    onClick={() => router.push(`../events/${e.name}`)}
+                    key={e.name}
+                    className="flex flex-col justify-center shadow-md rounded w-full cursor-pointer hover:scale-105 transition duration-300 ease-in-out"
+                  >
+                    <div className="p-2">{e.id}</div>
+                    <img src={e.image} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex h-[350px] justify-center items-center">
+                <div
+                  className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"
+                  role="status"
+                >
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            )}
+          </div>
+          {/* <div className="grid gap-2 sm:gap-4 grid-cols-2 m-4 justify-center items-center">
             {balances ? (
               balances.map((e: any) => (
                 <div
@@ -209,7 +338,7 @@ export default function Profile() {
             ) : (
               <p>No purchased tickets yet.</p>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
     </>

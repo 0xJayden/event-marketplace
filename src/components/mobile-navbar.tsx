@@ -70,6 +70,9 @@ export default function MobileNavbar({ openMenu }: Menu) {
           // onClick={() => {
           //   router.push(`/profile/${account ? account : address}`);
           // }}
+          onClick={() => {
+            router.push(`/profile/${session?.user?.id}`);
+          }}
           className="flex justify-start items-center space-x-4 cursor-pointer"
         >
           <UserIcon className="h-7" />

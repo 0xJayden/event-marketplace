@@ -6,7 +6,7 @@ interface MobileSearchBar {
   openSearch: boolean;
   setOpenSearch: Dispatch<SetStateAction<boolean>>;
   handleSearch: (e: BaseSyntheticEvent) => void;
-  setSearchResults: Dispatch<SetStateAction<never[]>>;
+  setSearchResults: Dispatch<SetStateAction<any[]>>;
   searchResults: Array<{
     name: string;
     image: string;

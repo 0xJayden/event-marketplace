@@ -15,6 +15,7 @@ import SearchResults from "./SearchResults";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useWeb3 } from "../hooks/useWeb3";
+import { trpc } from "../utils/trpc";
 
 const cairo = Cairo({ subsets: ["latin"] });
 
@@ -27,7 +28,7 @@ interface Navbar {
 export default function Navbar({}: Navbar) {
   const [openMenu, setOpenMenu] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<Array<any>>([]);
   const [pfp, setPfp] = useState<string>();
 
   const router = useRouter();
@@ -36,14 +37,20 @@ export default function Navbar({}: Navbar) {
 
   const { data: session } = useSession();
 
+  const { data } = trpc.event.getAll.useQuery();
+
   const handleSearch = (e: BaseSyntheticEvent) => {
     if (!e.target.value) return setSearchResults([]);
-    // const results = data.events.filter(
-    //   (event: any) =>
-    //     event.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
-    //     event.description.toLowerCase().includes(e.target.value.toLowerCase())
-    // );
-    // setSearchResults(results);
+    if (!data?.events) return setSearchResults([]);
+
+    console.log(data.events, "data.events");
+
+    const results = data.events.filter(
+      (event: any) =>
+        event.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
+        event.description.toLowerCase().includes(e.target.value.toLowerCase())
+    );
+    setSearchResults(results);
   };
 
   // const loadProfilePic = async () => {

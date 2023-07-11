@@ -48,12 +48,12 @@ export default function ExploreEvents() {
     return (
       <>
         <Navbar />
-        <div className="flex h-[350px] justify-center items-center">
+        <div className="flex h-[350px] bg-slate-800 justify-center items-center">
           <div
-            className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"
+            className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-orange-500"
             role="status"
           >
-            <span className="visually-hidden">Loading...</span>
+            {/* <span className="visually-hidden">Loading...</span> */}
           </div>
         </div>
       </>
@@ -64,12 +64,12 @@ export default function ExploreEvents() {
       {openModal && <Modal />}
       <div
         style={cairo.style}
-        className="flex text-slate-200 bg-slate-800 min-h-screen flex-col items-center w-full"
+        className="flex text-slate-200 bg-slate-900 min-h-screen flex-col items-center w-full"
       >
         <div className="w-full max-w-[1000px] pt-4 pl-2 sm:pl-4">
           <h1 className="text-3xl text-center font-bold">All events</h1>
         </div>
-        <div className="flex flex-col items-center gap-3 my-4 sm:grid-cols-4 sm:grid sm:max-w-[1000px]">
+        <div className="flex flex-col w-full items-center gap-3 my-4 sm:grid-cols-4 sm:grid sm:max-w-[1000px]">
           {data && data.events
             ? data.events.map((event: Event) => (
                 <FeedItem
@@ -115,7 +115,7 @@ export function FeedItem({
   const [openModal, setOpenModal] = useRecoilState(modalState);
   const [eventName, setEventName] = useRecoilState(eventNameState);
 
-  const { data, refetch } = trpc.user.get.useQuery(undefined, {
+  const { data, refetch } = trpc.user.getUserWithLikes.useQuery(undefined, {
     onSuccess: (data) => {
       console.log(data);
       const userLiked = data?.userWithLikes?.likes.find(
@@ -252,7 +252,7 @@ export function FeedItem({
   return (
     <ul
       key={id}
-      className={`sm:relative max-w-[310px] border-[#ff9531] flex flex-col justify-center text-start font-light mb-2 px-4 py-2 sm:max-w-[300px] border rounded-lg shadow-md sm:h-[420px] 
+      className={`sm:relative w-[90%] border-[#844d19] bg-slate-800 flex flex-col justify-center text-start font-light mb-2 px-4 py-2 sm:max-w-[300px] border rounded-lg shadow-md sm:h-[420px] 
        sm:w-full`}
     >
       <div className="flex items-center justify-between">
@@ -265,7 +265,7 @@ export function FeedItem({
       </div>
       <li
         onClick={() => router.push(`/events/${id}`)}
-        className={`flex overflow-hidden border border-slate-700 h-[220px] w-[270px] rounded justify-center`}
+        className={`flex overflow-hidden items-center border border-slate-700 rounded justify-center`}
       >
         <Image
           alt=""

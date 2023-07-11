@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Moment from "react-moment";
 import { useRecoilState } from "recoil";
 import { HeartIcon, TicketIcon } from "@heroicons/react/outline";
+import { Cairo } from "next/font/google";
 
 import CreatedEvent from "../../../abis/Event.json";
 import Navbar from "../../components/Navbar";
@@ -17,6 +18,8 @@ import Modal from "../../components/Modal";
 import { useWeb3 } from "../../hooks/useWeb3";
 import { trpc } from "../../utils/trpc";
 import eth from "../../../public/eth.png";
+
+const cairo = Cairo({ subsets: ["latin"] });
 
 export default function EventDetails() {
   const [event, setEvent] = useState(null);
@@ -175,12 +178,12 @@ export default function EventDetails() {
   //   );
 
   return (
-    <div>
+    <div style={cairo.style}>
       <Head>
         <title>{data?.event?.name}</title>
       </Head>
       <Navbar />
-      {/* {openModal && <Modal account={account} />} */}
+      {openModal && <Modal />}
       {/* <div className="flex flex-col items-center sm:hidden">
       </div> */}
 
@@ -199,10 +202,10 @@ export default function EventDetails() {
           ) : (
             <div className="flex h-[350px] justify-center items-center">
               <div
-                className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"
+                className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-orange-500"
                 role="status"
               >
-                <span className="visually-hidden">Loading...</span>
+                {/* <span className="visually-hidden">Loading...</span> */}
               </div>
             </div>
           )}
@@ -215,8 +218,8 @@ export default function EventDetails() {
           <p className=" overflow-hidden text-ellipsis">
             Host: {data?.event?.createdBy}
           </p>
-          <div className="border border-slate-500 rounded-md w-full max-w-[500px]">
-            <h1 className="font-bold border-b border-b-slate-500 p-2">
+          <div className="border border-slate-600 rounded-md w-full max-w-[500px]">
+            <h1 className="font-bold border-b border-b-slate-600 p-2">
               Description
             </h1>
             <p className="p-4">{data?.event?.description}</p>
@@ -238,8 +241,8 @@ export default function EventDetails() {
               })}
             </p> */}
           </div>
-          <div className="border border-slate-500 rounded-md">
-            <h1 className="p-2 border-b border-slate-500 font-bold">
+          <div className="border border-slate-600 rounded-md">
+            <h1 className="p-2 border-b border-slate-600 font-bold">
               Ticket information
             </h1>
             <div className="p-6 flex items-center justify-around">
@@ -248,8 +251,8 @@ export default function EventDetails() {
                 <TicketIcon className="h-5 text-slate-400" />
               </div>
               <div className="flex items-center">
-                <p>{data?.event?.price}</p>
-                <Image alt="" src={eth} height={20} width={20} />
+                <p>${data?.event?.price.toFixed(2)}</p>
+                {/* <Image alt="" src={eth} height={20} width={20} /> */}
               </div>
             </div>
             <div className="flex justify-center">
@@ -257,7 +260,7 @@ export default function EventDetails() {
                 // onClick={() => mint(event.address, event.costPerTicket, 0)}
                 className="bg-[#ff9531] w-full rounded-t-none text-white border border-[#ff9531] font-normal rounded py-2 px-6 max-h-[42px] hover:bg-white hover:text-green-500 transition duration-500 ease-out"
               >
-                Mint
+                Buy
               </button>
             </div>
           </div>
