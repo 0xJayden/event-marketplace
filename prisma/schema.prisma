@@ -1,0 +1,117 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider     = "mysql"
+    url          = env("DATABASE_URL")
+    relationMode = "prisma"
+}
+
+// Necessary for Next auth
+
+model Account {
+    id                String  @id @default(cuid())
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? @db.Text
+    session_state     String?
+    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+    @@index([userId], name: "userId")
+}
+
+model Session {
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId], name: "userId")
+}
+
+model User {
+    id            String    @id @default(uuid())
+    email         String    @unique
+    emailVerified DateTime?
+    image         String?
+    name          String?
+    createdAt     DateTime  @default(now())
+    wallet        Wallet?
+    accounts      Account[]
+    sessions      Session[]
+    event         Event[]
+    likes         Like[]
+    comments      Comment[]
+    followers     User[]    @relation(name: "Followers")
+    following     User[]    @relation(name: "Followers")
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+model Event {
+    id              String    @id @default(uuid())
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    name            String
+    createdBy       String
+    amountOfTickets Int
+    price           Int
+    description     String    @db.LongText
+    cid             String
+    userId          String
+    user            User      @relation(fields: [userId], references: [id])
+    likes           Like[]
+    comments        Comment[]
+
+    @@index([userId], name: "userId")
+}
+
+model Like {
+    id      String @id @default(uuid())
+    userId  String
+    eventId String
+    user    User   @relation(fields: [userId], references: [id])
+    event   Event  @relation(fields: [eventId], references: [id])
+
+    @@index([userId], name: "userId")
+    @@index([eventId], name: "eventId")
+}
+
+model Comment {
+    id      String @id @default(uuid())
+    text    String
+    userId  String
+    eventId String
+    user    User   @relation(fields: [userId], references: [id])
+    event   Event  @relation(fields: [eventId], references: [id])
+
+    @@index([userId], name: "userId")
+    @@index([eventId], name: "eventId")
+}
+
+model Wallet {
+    address    String @id
+    publicKey  String
+    privateKey String
+    mnemonic   String
+    userId     String @unique
+    user       User   @relation(fields: [userId], references: [id])
+
+    @@index([userId], name: "userId")
+}
