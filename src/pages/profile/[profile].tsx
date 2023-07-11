@@ -33,15 +33,42 @@ export default function Profile() {
   // const { address } = useWallet();
 
   const { data } = trpc.user.getUserWithTickets.useQuery(undefined, {
+    onSuccess: (data) => {
+      if (data?.userWithTickets?.image) setPfp(data.userWithTickets.image);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
     enabled: !!onTickets,
   });
 
   const { data: events } = trpc.user.getUserWithEvents.useQuery(undefined, {
+    onSuccess: (data) => {
+      if (data?.userWithEvents?.image) setPfp(data.userWithEvents.image);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
     enabled: !!onEvents,
   });
 
   const { data: likes } = trpc.user.getUserWithLikes.useQuery(undefined, {
+    onSuccess: (data) => {
+      if (data?.userWithLikes?.image) setPfp(data.userWithLikes.image);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
     enabled: !!onLikes,
+  });
+
+  const uploadProfilePicture = trpc.user.uploadProfilePicture.useMutation({
+    onSuccess: (data) => {
+      console.log(data);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
   });
 
   // const loadBalances = async () => {
@@ -83,19 +110,7 @@ export default function Profile() {
       )
         return;
       setPfp(e.target.result);
-      const body = {
-        pfpImage: e.target.result,
-        account: account,
-      };
-      await fetch("../api/add-profile-picture", {
-        method: "POST",
-        body: JSON.stringify(body),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => console.log("Success:", data));
+      uploadProfilePicture.mutate(e.target.result);
     });
   };
 
@@ -192,7 +207,7 @@ export default function Profile() {
               hidden
             ></input>
             {pfp ? (
-              <img src={pfp} />
+              <Image src={pfp} alt="" width={100} height={100} />
             ) : (
               <div className="flex h-full justify-center items-center">
                 <UserIcon className="h-20" />

@@ -2,6 +2,7 @@ import { z } from "zod";
 import axios from "axios";
 import FormData from "form-data";
 import fs from "fs";
+import { tmpdir } from "os";
 
 import { publicProcedure, router } from "../trpc";
 
@@ -91,9 +92,11 @@ export const eventRouter = router({
     .mutation(async ({ input, ctx }) => {
       if (!ctx.session?.user) return { error: "not logged in" };
 
-      const dirname = __dirname;
+      // const dirname = __dirname;
 
-      const fileName = dirname + "/" + input.name + ".jpeg";
+      // const fileName = dirname + "/" + input.name + ".jpeg";
+
+      const fileName = tmpdir() + "/" + input.name + ".jpeg";
 
       // stripping metadata from base64
       const matches = input.image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
