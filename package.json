@@ -40,7 +40,8 @@
     "dev": "next dev",
     "build": "next build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "postinstall": "prisma generate"
   },
   "eslintConfig": {
     "extends": [
