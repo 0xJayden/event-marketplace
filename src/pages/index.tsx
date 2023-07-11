@@ -121,7 +121,9 @@ const BackgroundImage = () => {
           className="w-full"
           src={`https://gateway.pinata.cloud/ipfs/${data.events[0].cid}`}
         />
-      ) : null}
+      ) : (
+        <div className="bg-slate-600 w-full h-[300px]"></div>
+      )}
       <div className="absolute inset-0 backdrop-blur"></div>
     </div>
   );
