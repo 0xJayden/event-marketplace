@@ -12,6 +12,14 @@ export const eventRouter = router({
       where: {
         id: input,
       },
+      include: {
+        likes: true,
+        comments: {
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
+      },
     });
 
     if (!event) return { error: "no event found" };
@@ -19,12 +27,65 @@ export const eventRouter = router({
     return { event };
   }),
   getAll: publicProcedure.query(async ({ ctx }) => {
-    const events = await ctx.prisma.event.findMany();
+    const events = await ctx.prisma.event.findMany({
+      include: {
+        likes: true,
+        comments: {
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
     if (!events) return { error: "no events found" };
 
     return { events: events };
   }),
+  comment: publicProcedure
+
+    .input(
+      z.object({
+        eventId: z.string(),
+        comment: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const user = ctx.session?.user;
+
+      if (!user) return { error: "not logged in" };
+
+      const event = await ctx.prisma.event.findUnique({
+        where: {
+          id: input.eventId,
+        },
+      });
+
+      if (!event) return { error: "no event found" };
+
+      await ctx.prisma.comment.create({
+        data: {
+          event: {
+            connect: {
+              id: input.eventId,
+            },
+          },
+          user: {
+            connect: {
+              id: user.id,
+            },
+          },
+          text: input.comment,
+          pfp: user.image,
+          author: user.name ? user.name : user.email ? user.email : "unknown",
+        },
+      });
+
+      return { msg: "comment created" };
+    }),
   likeEvent: publicProcedure
     .input(
       z.object({

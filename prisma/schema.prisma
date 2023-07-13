@@ -108,12 +108,15 @@ model Like {
 }
 
 model Comment {
-    id      String @id @default(uuid())
-    text    String
-    userId  String
-    eventId String
-    user    User   @relation(fields: [userId], references: [id])
-    event   Event  @relation(fields: [eventId], references: [id])
+    id        String   @id @default(uuid())
+    text      String
+    author    String
+    pfp       String?
+    createdAt DateTime @default(now())
+    userId    String
+    eventId   String
+    user      User     @relation(fields: [userId], references: [id])
+    event     Event    @relation(fields: [eventId], references: [id])
 
     @@index([userId], name: "userId")
     @@index([eventId], name: "eventId")
