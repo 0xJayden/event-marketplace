@@ -60,12 +60,141 @@ export const userRouter = router({
 
     return { userWithTickets };
   }),
+  uploadBanner: publicProcedure
+    .input(z.string())
+    .mutation(async ({ input, ctx }) => {
+      const user = ctx.session?.user;
+
+      if (!user) return { error: "not logged in" };
+
+      const userHasBanner = await ctx.prisma.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        select: {
+          image: true,
+        },
+      });
+
+      if (userHasBanner?.image) {
+        try {
+          await axios.delete(
+            `https://api.pinata.cloud/pinning/unpin/${userHasBanner.image.replace(
+              "https://gateway.pinata.cloud/ipfs/",
+              ""
+            )}}`,
+            {
+              headers: {
+                pinata_api_key: process.env.PINATA_API_KEY
+                  ? process.env.PINATA_API_KEY
+                  : "",
+                pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY
+                  ? process.env.PINATA_SECRET_API_KEY
+                  : "",
+              },
+            }
+          );
+          console.log("deleted pfp");
+        } catch (error) {
+          console.log(error, "error");
+        }
+      }
+
+      const fileName = tmpdir() + "/" + user.name + "Banner" + ".jpeg";
+
+      // stripping metadata from base64
+      const matches = input.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+
+      if (matches?.length !== 3) return { error: "error parsing image" };
+
+      const buffer = Buffer.from(matches[2], "base64");
+
+      // save image to server
+      fs.writeFile(fileName, buffer, (err) => {
+        if (err) {
+          console.log(err, "error");
+          return { error: "error saving image" };
+        }
+        console.log("file saved");
+      });
+
+      // post image & json metadata to pinata with formdata
+      const body = new FormData();
+      body.append("file", fs.createReadStream(fileName));
+
+      try {
+        const result = await axios.post(
+          "https://api.pinata.cloud/pinning/pinFileToIPFS",
+          body,
+          {
+            headers: {
+              "Content-Type": `multipart/form-data; boundary=${body.getBoundary()}`,
+              pinata_api_key: process.env.PINATA_API_KEY
+                ? process.env.PINATA_API_KEY
+                : "",
+              pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY
+                ? process.env.PINATA_SECRET_API_KEY
+                : "",
+            },
+          }
+        );
+
+        const cid = result.data.IpfsHash;
+
+        const userWithBanner = await ctx.prisma.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            banner: `https://gateway.pinata.cloud/ipfs/${cid}`,
+          },
+        });
+
+        return { userWithBanner };
+      } catch (error) {
+        console.log(error, "error");
+        return { error: "error uploading image" };
+      }
+    }),
   uploadProfilePicture: publicProcedure
     .input(z.string())
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session?.user;
 
       if (!user) return { error: "not logged in" };
+
+      const userHasProfilePicture = await ctx.prisma.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        select: {
+          image: true,
+        },
+      });
+
+      if (userHasProfilePicture?.image) {
+        try {
+          await axios.delete(
+            `https://api.pinata.cloud/pinning/unpin/${userHasProfilePicture.image.replace(
+              "https://gateway.pinata.cloud/ipfs/",
+              ""
+            )}}`,
+            {
+              headers: {
+                pinata_api_key: process.env.PINATA_API_KEY
+                  ? process.env.PINATA_API_KEY
+                  : "",
+                pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY
+                  ? process.env.PINATA_SECRET_API_KEY
+                  : "",
+              },
+            }
+          );
+          console.log("deleted pfp");
+        } catch (error) {
+          console.log(error, "error");
+        }
+      }
 
       // const dirname = __dirname;
 

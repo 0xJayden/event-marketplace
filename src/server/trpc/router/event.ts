@@ -195,31 +195,31 @@ export const eventRouter = router({
           }
         );
 
-        const jsonBody = JSON.stringify({
-          pinataMetadata: {
-            name: input.name + ".json",
-          },
-          pinataContent: {
-            name: input.name,
-            image: "ipfs://" + result.data.IpfsHash,
-          },
-        });
+        // const jsonBody = JSON.stringify({
+        //   pinataMetadata: {
+        //     name: input.name + ".json",
+        //   },
+        //   pinataContent: {
+        //     name: input.name,
+        //     image: "ipfs://" + result.data.IpfsHash,
+        //   },
+        // });
 
-        const jsonUpload = await axios.post(
-          "https://api.pinata.cloud/pinning/pinJSONToIPFS",
-          jsonBody,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              pinata_api_key: process.env.PINATA_API_KEY
-                ? process.env.PINATA_API_KEY
-                : "",
-              pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY
-                ? process.env.PINATA_SECRET_API_KEY
-                : "",
-            },
-          }
-        );
+        // const jsonUpload = await axios.post(
+        //   "https://api.pinata.cloud/pinning/pinJSONToIPFS",
+        //   jsonBody,
+        //   {
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       pinata_api_key: process.env.PINATA_API_KEY
+        //         ? process.env.PINATA_API_KEY
+        //         : "",
+        //       pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY
+        //         ? process.env.PINATA_SECRET_API_KEY
+        //         : "",
+        //     },
+        //   }
+        // );
 
         const cid = result.data.IpfsHash;
 

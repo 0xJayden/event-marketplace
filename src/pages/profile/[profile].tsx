@@ -73,6 +73,15 @@ export default function Profile() {
     },
   });
 
+  const uploadBanner = trpc.user.uploadBanner.useMutation({
+    onSuccess: (data) => {
+      console.log(data);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+
   // const compressImage = trpc.user.compressImage.useMutation()
 
   // const loadBalances = async () => {
@@ -106,8 +115,6 @@ export default function Profile() {
     if (!["image/jpeg", "image/png"].includes(image.type))
       return console.log("not an image");
 
-    // compressImage.mutate(image)
-
     new Compressor(image, {
       quality: 0.8,
       width: 100,
@@ -134,29 +141,26 @@ export default function Profile() {
     const image = e.target.files[0];
     if (!image) return;
     if (!["image/jpeg", "image/png"].includes(image.type)) return;
-    let fileReader = new FileReader();
-    fileReader.readAsDataURL(image);
-    fileReader.addEventListener("load", async (e) => {
-      if (
-        e.target == null ||
-        e.target.result == null ||
-        typeof e.target.result !== "string"
-      )
-        return;
-      setBanner(e.target.result);
-      const body = {
-        bannerImage: e.target.result,
-        account: account,
-      };
-      await fetch("../api/add-banner-picture", {
-        method: "POST",
-        body: JSON.stringify(body),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => console.log("Success:", data));
+
+    new Compressor(image, {
+      quality: 0.8,
+      width: 400,
+      height: 120,
+      resize: "cover",
+      success(result) {
+        let fileReader = new FileReader();
+        fileReader.readAsDataURL(result);
+        fileReader.addEventListener("load", async (e) => {
+          if (
+            e.target == null ||
+            e.target.result == null ||
+            typeof e.target.result !== "string"
+          )
+            return;
+          setBanner(e.target.result);
+          uploadBanner.mutate(e.target.result);
+        });
+      },
     });
   };
 
@@ -188,7 +192,9 @@ export default function Profile() {
         <div className="relative w-full sm:w-5/6 sm:max-w-[1000px]">
           <div
             onClick={() => bannerImageInputRef.current?.click()}
-            className={`h-[100px] overflow-hidden sm:h-[200px] animate-pulse w-full bg-slate-600 cursor-pointer hover:opacity-70`}
+            className={`h-[100px] overflow-hidden sm:h-[200px] ${
+              !banner && "animate-pulse"
+            } w-full bg-slate-600 cursor-pointer hover:opacity-70`}
           >
             <input
               className="text-xs ml-8 w-1/2"
@@ -201,7 +207,7 @@ export default function Profile() {
               hidden
             ></input>
             {banner ? (
-              <img src={banner} />
+              <Image alt="" width={400} height={100} src={banner} />
             ) : (
               <div className="flex h-full justify-center items-center">
                 {/* <PencilIcon className="h-7 text-gray-200" /> */}
