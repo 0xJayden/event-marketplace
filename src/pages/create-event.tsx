@@ -2,6 +2,8 @@ import { useRef, useState, FormEvent, ChangeEvent } from "react";
 import { PhotographIcon, XIcon } from "@heroicons/react/outline";
 import { AbiItem } from "web3-utils";
 import { Cairo } from "next/font/google";
+import Image from "next/image";
+import Compressor from "compressorjs";
 
 import CreateEventAbi from "../../abis/CreateEvent.json";
 import Loading from "../components/Loading";
@@ -24,7 +26,6 @@ export default function CreateEvent() {
   const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const [isImageSelected, setIsImageSelected] = useState(false);
   const [imagePreviewSrc, setImagePreviewSrc] = useState("");
   const [image, setImage] = useState<File>();
   const [eventPlaced, setEventPlaced] = useState(false);
@@ -88,20 +89,28 @@ export default function CreateEvent() {
 
   const showImagePreview = (e: ChangeEvent) => {
     const image = (e.target as HTMLInputElement).files?.[0];
-    if (!image) return;
+    if (!image) return console.log("no image");
     setImage(image);
 
-    if (!["image/jpeg", "image/png"].includes(image.type)) return;
+    if (!["image/jpeg", "image/png"].includes(image.type))
+      return console.log("not an image");
 
-    let fileReader = new FileReader();
-    fileReader.readAsDataURL(image);
-    fileReader.addEventListener("load", (e) => {
-      if (e.target == null) return;
-      if (e.target.result == null || typeof e.target.result !== "string")
-        return;
-      const result = e.target.result;
-      setImagePreviewSrc(result);
-      setIsImageSelected(true);
+    new Compressor(image, {
+      quality: 0.8,
+      maxWidth: 300,
+      maxHeight: 500,
+      resize: "cover",
+      success(result) {
+        let fileReader = new FileReader();
+        fileReader.readAsDataURL(result);
+        fileReader.addEventListener("load", (e) => {
+          if (e.target == null) return;
+          if (e.target.result == null || typeof e.target.result !== "string")
+            return;
+          const result = e.target.result;
+          setImagePreviewSrc(result);
+        });
+      },
     });
   };
 
@@ -233,17 +242,20 @@ export default function CreateEvent() {
             {/* <div className="flex self-center font-bold">
               <p>Select Image</p>
             </div> */}
-            {isImageSelected ? (
+            {imagePreviewSrc ? (
               <div className="relative flex justify-center">
                 <button
                   onClick={() => {
-                    setIsImageSelected(!isImageSelected);
+                    setImagePreviewSrc("");
                   }}
                   className="absolute flex sm:left-[420px] rounded-full backdrop-brightness-50 cursor-pointer left-5 top-1 hover:bg-red-300 transition duration-200 ease-out"
                 >
                   <XIcon className="h-7" />
                 </button>
-                <img
+                <Image
+                  alt="event image"
+                  width={300}
+                  height={300}
                   className="max-w-[300px] border border-slate-700 rounded-md"
                   src={imagePreviewSrc}
                 />
@@ -258,6 +270,7 @@ export default function CreateEvent() {
                   className="text-xs ml-8 w-1/2"
                   required
                   type="file"
+                  accept="image/*"
                   name="photo"
                   id="photo"
                   onChange={(e) => showImagePreview(e)}

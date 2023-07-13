@@ -14,7 +14,7 @@ export default function SearchResults({
       {searchResults?.map((item) => (
         <div
           key={item.id}
-          onClick={() => router.push(`/events/${item.name}`)}
+          onClick={() => router.push(`/events/${item.id}`)}
           className="flex items-center p-4 border-b backdrop-blur backdrop-brightness-50 text-white hover:bg-slate-200"
         >
           <div>

@@ -11,6 +11,8 @@ import { useWallet } from "../../hooks/useWallet";
 import { trpc } from "../../utils/trpc";
 import { on } from "events";
 import Image from "next/image";
+import Compressor from "compressorjs";
+import { tmpdir } from "os";
 
 const cairo = Cairo({ subsets: ["latin"] });
 
@@ -71,6 +73,8 @@ export default function Profile() {
     },
   });
 
+  // const compressImage = trpc.user.compressImage.useMutation()
+
   // const loadBalances = async () => {
   //   setLoading(true);
   //   let newBalances: Array<{}> = [];
@@ -98,19 +102,31 @@ export default function Profile() {
 
   const setProfilePicture = (e: BaseSyntheticEvent) => {
     const image = e.target.files[0];
-    if (!image) return;
-    if (!["image/jpeg", "image/png"].includes(image.type)) return;
-    let fileReader = new FileReader();
-    fileReader.readAsDataURL(image);
-    fileReader.addEventListener("load", async (e) => {
-      if (
-        e.target == null ||
-        e.target.result == null ||
-        typeof e.target.result !== "string"
-      )
-        return;
-      setPfp(e.target.result);
-      uploadProfilePicture.mutate(e.target.result);
+    if (!image) return console.log("no image");
+    if (!["image/jpeg", "image/png"].includes(image.type))
+      return console.log("not an image");
+
+    // compressImage.mutate(image)
+
+    new Compressor(image, {
+      quality: 0.8,
+      width: 100,
+      height: 100,
+      resize: "cover",
+      success(result) {
+        let fileReader = new FileReader();
+        fileReader.readAsDataURL(result);
+        fileReader.addEventListener("load", async (e) => {
+          if (
+            e.target == null ||
+            e.target.result == null ||
+            typeof e.target.result !== "string"
+          )
+            return;
+          setPfp(e.target.result);
+          uploadProfilePicture.mutate(e.target.result);
+        });
+      },
     });
   };
 
