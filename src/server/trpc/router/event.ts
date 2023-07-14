@@ -139,6 +139,74 @@ export const eventRouter = router({
         return { event };
       }
     }),
+  buyTicket: publicProcedure
+    .input(
+      z.object({
+        eventId: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const user = ctx.session?.user;
+
+      if (!user) return { error: "not logged in" };
+
+      const userWithTickets = await ctx.prisma.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          tickets: true,
+        },
+      });
+
+      if (!userWithTickets) return { error: "no user found" };
+
+      const ticketExists = userWithTickets.tickets.find(
+        (ticket) => ticket.eventId === input.eventId
+      );
+
+      if (ticketExists) return { error: "ticket already bought" };
+
+      const event = await ctx.prisma.event.findUnique({
+        where: {
+          id: input.eventId,
+        },
+      });
+
+      if (!event) return { error: "no event found" };
+      if (event.amountOfTickets === 0) return { error: "no tickets left" };
+
+      const ticket = await ctx.prisma.ticket.create({
+        data: {
+          event: {
+            connect: {
+              id: input.eventId,
+            },
+          },
+          user: {
+            connect: {
+              id: user.id,
+            },
+          },
+          eventName: event.name,
+          price: event.price,
+          image: `https://gateway.pinata.cloud/ipfs/${event.cid}`,
+        },
+      });
+
+      if (!ticket) return { error: "error creating ticket" };
+
+      await ctx.prisma.event.update({
+        where: {
+          id: input.eventId,
+        },
+        data: {
+          amountOfTickets: event.amountOfTickets - 1,
+        },
+      });
+
+      return { ticket };
+    }),
   create: publicProcedure
     .input(
       z.object({

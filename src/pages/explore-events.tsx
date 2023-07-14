@@ -172,6 +172,16 @@ export function FeedItem({
     },
   });
 
+  const buyTicketMutation = trpc.event.buyTicket.useMutation({
+    onSuccess: (data) => {
+      console.log(data);
+      if (refetchEvents) refetchEvents();
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   const addComment = (e: FormEvent) => {
     e.preventDefault();
     commentMutation.mutate({ eventId: id, comment });
@@ -180,6 +190,10 @@ export function FeedItem({
 
   const likeEvent = () => {
     likeMutation.mutate({ eventId: id });
+  };
+
+  const buyTicket = () => {
+    buyTicketMutation.mutate({ eventId: id });
   };
 
   // const mint = async (address: string, value: number, id: number) => {
@@ -366,7 +380,10 @@ export function FeedItem({
       )} */}
 
         <div className="flex justify-center w-full mt-2 sm:absolute sm:bottom-0 sm:left-0">
-          <button className="bg-[#ff9531] w-full sm:w-full sm:rounded-t-none text-white border border-[#ff9531] font-bold rounded-md py-2 px-6 max-h-[42px] hover:bg-white hover:text-green-500 transition duration-500 ease-out">
+          <button
+            onClick={() => buyTicket()}
+            className="bg-[#ff9531] w-full sm:w-full sm:rounded-t-none text-white border border-[#ff9531] font-bold rounded-lg py-2 px-6 transition duration-500 ease-out"
+          >
             Buy
           </button>
           {/* {account || address ? (

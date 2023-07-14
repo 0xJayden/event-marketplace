@@ -68,11 +68,14 @@ model VerificationToken {
 }
 
 model Ticket {
-    id      String @id @default(uuid())
-    userId  String
-    eventId String
-    user    User   @relation(fields: [userId], references: [id])
-    event   Event  @relation(fields: [eventId], references: [id])
+    id        String @id @default(uuid())
+    userId    String
+    eventId   String
+    eventName String
+    price     Int
+    image     String
+    user      User   @relation(fields: [userId], references: [id])
+    event     Event  @relation(fields: [eventId], references: [id])
 
     @@index([userId], name: "userId")
     @@index([eventId], name: "eventId")

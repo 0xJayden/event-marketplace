@@ -30,6 +30,8 @@ export default function Profile() {
 
   const router = useRouter();
 
+  const { profile } = router.query;
+
   const { account, web3 } = useWeb3();
 
   // const { address } = useWallet();
@@ -37,6 +39,7 @@ export default function Profile() {
   const { data } = trpc.user.getUserWithTickets.useQuery(undefined, {
     onSuccess: (data) => {
       if (data?.userWithTickets?.image) setPfp(data.userWithTickets.image);
+      if (data.userWithTickets?.banner) setBanner(data.userWithTickets.banner);
     },
     onError: (err) => {
       console.log(err);
@@ -236,6 +239,15 @@ export default function Profile() {
               </div>
             )}
           </div>
+          {profile === data?.userWithTickets?.id ? (
+            <button className="rounded-lg absolute right-5 mt-3 border border-slate-600 p-2">
+              Edit Profile
+            </button>
+          ) : (
+            <button className="rounded-lg absolute right-5 mt-3 border border-slate-600 p-2">
+              Follow
+            </button>
+          )}
           <div className="mt-[55px] ml-4 max-w-[200px]">
             {/* <p className="text-xl font-bold overflow-hidden text-ellipsis hover:underline cursor-pointer">
               {account ? account : address}
@@ -296,12 +308,20 @@ export default function Profile() {
                 data.userWithTickets.tickets.length > 0
                   ? data?.userWithTickets?.tickets.map((e: any) => (
                       <div
-                        onClick={() => router.push(`../tickets/${e.name}`)}
-                        key={e.name}
-                        className="flex flex-col justify-center shadow-md rounded w-full cursor-pointer hover:scale-105 transition duration-300 ease-in-out"
+                        onClick={() => router.push(`../events/${e.eventId}`)}
+                        key={e.id}
+                        className="flex relative flex-col justify-center shadow-md rounded w-full cursor-pointer hover:scale-105 transition duration-300 ease-in-out"
                       >
-                        <div className="p-2">{e.name}</div>
-                        <img src={e.image} />
+                        <Image
+                          className="rounded-lg"
+                          alt=""
+                          width={300}
+                          height={200}
+                          src={e.image}
+                        />
+                        <div className="absolute rounded-b-lg backdrop-brightness-50 w-full bottom-0 p-2">
+                          {e.eventName}
+                        </div>
                       </div>
                     ))
                   : "No Tickets yet."}
@@ -332,7 +352,7 @@ export default function Profile() {
                 {likes?.userWithLikes?.likes.map((e: any) => (
                   <div
                     onClick={() => router.push(`../events/${e.name}`)}
-                    key={e.name}
+                    key={e.id}
                     className="flex flex-col justify-center shadow-md rounded w-full cursor-pointer hover:scale-105 transition duration-300 ease-in-out"
                   >
                     <div className="p-2">{e.id}</div>
@@ -346,7 +366,7 @@ export default function Profile() {
                   className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"
                   role="status"
                 >
-                  <span className="visually-hidden">Loading...</span>
+                  {/* <span className="visually-hidden">Loading...</span> */}
                 </div>
               </div>
             )}
