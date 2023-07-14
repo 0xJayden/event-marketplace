@@ -16,6 +16,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useWeb3 } from "../hooks/useWeb3";
 import { trpc } from "../utils/trpc";
+import { set } from "zod";
 
 const cairo = Cairo({ subsets: ["latin"] });
 
@@ -37,19 +38,37 @@ export default function Navbar({}: Navbar) {
 
   const { data: session } = useSession();
 
-  const { data } = trpc.event.getAll.useQuery();
+  const { data } = trpc.event.getAll.useQuery(undefined, {
+    enabled: !!openSearch,
+  });
+
+  const { data: users } = trpc.user.getAll.useQuery(undefined, {
+    enabled: !!openSearch,
+  });
 
   const handleSearch = (e: BaseSyntheticEvent) => {
     if (!e.target.value) return setSearchResults([]);
     if (!data?.events) return setSearchResults([]);
+    if (!users?.users) return setSearchResults([]);
 
     console.log(data.events, "data.events");
+    console.log(users.users, "users.users");
 
-    const results = data.events.filter(
+    const events = data.events.filter(
       (event: any) =>
         event.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
         event.description.toLowerCase().includes(e.target.value.toLowerCase())
     );
+
+    const usersFiltered = users.users.filter((user: any) =>
+      // if(user.name) user.name.toLowerCase().includes(e.target.value.toLowerCase())
+      user.email.toLowerCase().includes(e.target.value.toLowerCase())
+    );
+
+    console.log(events, "events");
+    console.log(usersFiltered, "usersFiltered");
+
+    const results = [...events, ...usersFiltered];
     setSearchResults(results);
   };
 

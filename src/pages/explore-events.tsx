@@ -134,22 +134,27 @@ export function FeedItem({
   // const [openModal, setOpenModal] = useRecoilState(modalState);
   // const [eventName, setEventName] = useRecoilState(eventNameState);
 
-  const { data, refetch } = trpc.user.getUserWithLikes.useQuery(undefined, {
-    onSuccess: (data) => {
-      console.log(data);
-      const userLiked = data?.userWithLikes?.likes.find(
-        (like) => like.eventId === id
-      );
-      if (userLiked) {
-        setLiked(true);
-      } else {
-        setLiked(false);
-      }
-    },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
+  const { data: session } = useSession();
+
+  const { data, refetch } = trpc.user.getUserWithLikes.useQuery(
+    session?.user?.id ? session.user.id : "",
+    {
+      onSuccess: (data) => {
+        console.log(data);
+        const userLiked = data?.userWithLikes?.likes.find(
+          (like) => like.eventId === id
+        );
+        if (userLiked) {
+          setLiked(true);
+        } else {
+          setLiked(false);
+        }
+      },
+      onError: (error) => {
+        console.log(error);
+      },
+    }
+  );
 
   const likeMutation = trpc.event.likeEvent.useMutation({
     onSuccess: (data) => {

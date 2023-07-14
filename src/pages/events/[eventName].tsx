@@ -24,6 +24,7 @@ import Modal from "../../components/Modal";
 import { useWeb3 } from "../../hooks/useWeb3";
 import { trpc } from "../../utils/trpc";
 import eth from "../../../public/eth.png";
+import { useSession } from "next-auth/react";
 
 const cairo = Cairo({ subsets: ["latin"] });
 
@@ -39,6 +40,8 @@ export default function EventDetails() {
   const router = useRouter();
   const { eventName } = router.query;
   console.log(eventName, "event name");
+
+  const { data: session } = useSession();
 
   const {
     data: eventData,
@@ -57,7 +60,7 @@ export default function EventDetails() {
   });
 
   const { data: userWithLikes, refetch } = trpc.user.getUserWithLikes.useQuery(
-    undefined,
+    session?.user?.id ? session.user.id : "",
     {
       onSuccess: (data) => {
         console.log(data);
@@ -73,6 +76,7 @@ export default function EventDetails() {
       onError: (error) => {
         console.log(error);
       },
+      enabled: !!session?.user?.id,
     }
   );
 

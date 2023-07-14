@@ -6,60 +6,79 @@ import { tmpdir } from "os";
 import FormData from "form-data";
 
 export const userRouter = router({
-  getUserWithLikes: publicProcedure.query(async ({ ctx }) => {
-    const user = ctx.session?.user;
+  getAll: publicProcedure.query(async ({ ctx }) => {
+    const users = await ctx.prisma.user.findMany();
 
-    if (!user) return { error: "not logged in" };
+    if (!users) return { error: "no users found" };
 
-    const userWithLikes = await ctx.prisma.user.findUnique({
-      where: {
-        id: user.id,
-      },
-      include: {
-        likes: true,
-        followers: true,
-        following: true,
-      },
-    });
-
-    return { userWithLikes };
+    return { users };
   }),
-  getUserWithEvents: publicProcedure.query(async ({ ctx }) => {
-    const user = ctx.session?.user;
+  getUserWithLikes: publicProcedure
+    .input(z.string())
+    .query(async ({ input, ctx }) => {
+      // const user = ctx.session?.user;
 
-    if (!user) return { error: "not logged in" };
+      // if (!user) return { error: "not logged in" };
 
-    const userWithEvents = await ctx.prisma.user.findUnique({
-      where: {
-        id: user.id,
-      },
-      include: {
-        events: true,
-        followers: true,
-        following: true,
-      },
-    });
+      // const isMe = user.id === input;
 
-    return { userWithEvents };
-  }),
-  getUserWithTickets: publicProcedure.query(async ({ ctx }) => {
-    const user = ctx.session?.user;
+      if (input === "null") {
+        return { error: "no user found" };
+      }
 
-    if (!user) return { error: "not logged in" };
+      const userWithLikes = await ctx.prisma.user.findUnique({
+        where: {
+          id: input,
+        },
+        include: {
+          likes: true,
+          followers: true,
+          following: true,
+        },
+      });
 
-    const userWithTickets = await ctx.prisma.user.findUnique({
-      where: {
-        id: user.id,
-      },
-      include: {
-        tickets: true,
-        followers: true,
-        following: true,
-      },
-    });
+      return { userWithLikes };
+    }),
+  getUserWithEvents: publicProcedure
+    .input(z.string())
+    .query(async ({ input, ctx }) => {
+      // const user = ctx.session?.user;
 
-    return { userWithTickets };
-  }),
+      // if (!user) return { error: "not logged in" };
+
+      const userWithEvents = await ctx.prisma.user.findUnique({
+        where: {
+          id: input,
+        },
+        include: {
+          events: true,
+          followers: true,
+          following: true,
+        },
+      });
+
+      return { userWithEvents };
+    }),
+  getUserWithTickets: publicProcedure
+    .input(z.string())
+    .query(async ({ input, ctx }) => {
+      // const user = ctx.session?.user;
+
+      // if (!user) return { error: "not logged in" };
+
+      const userWithTickets = await ctx.prisma.user.findUnique({
+        where: {
+          id: input,
+        },
+        include: {
+          tickets: true,
+          followers: true,
+          following: true,
+        },
+      });
+
+      return { userWithTickets };
+    }),
   uploadBanner: publicProcedure
     .input(z.string())
     .mutation(async ({ input, ctx }) => {
@@ -257,7 +276,78 @@ export const userRouter = router({
         return { error: "error uploading image" };
       }
     }),
+  follow: publicProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
+    const user = ctx.session?.user;
 
+    if (!user) return { error: "not logged in" };
+
+    const userToFollow = await ctx.prisma.user.findUnique({
+      where: {
+        id: input,
+      },
+    });
+
+    if (!userToFollow) return { error: "user not found" };
+
+    const userAlreadyFollows = await ctx.prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      select: {
+        following: {
+          where: {
+            id: userToFollow.id,
+          },
+        },
+      },
+    });
+
+    if (userAlreadyFollows?.following?.length) {
+      await ctx.prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          following: {
+            disconnect: {
+              id: userToFollow.id,
+            },
+          },
+        },
+      });
+
+      return { msg: "unfollowed" };
+
+      //   await ctx.prisma.user.update({
+      //     where: {
+      //         id: userToFollow.id,
+      //     },
+      //     data: {
+      //         followers: {
+      //             disconnect: {
+      //                 id: user.id
+      //             }
+      //         }
+      //     }
+
+      //   })
+    }
+
+    const userWithFollowing = await ctx.prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        following: {
+          connect: {
+            id: userToFollow.id,
+          },
+        },
+      },
+    });
+
+    return { msg: "followed" };
+  }),
   //   getUserWithEverything: publicProcedure.query(async ({ ctx }) => {
   //     const user = ctx.session?.user;
 

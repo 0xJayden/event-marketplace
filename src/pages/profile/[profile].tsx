@@ -13,6 +13,8 @@ import { on } from "events";
 import Image from "next/image";
 import Compressor from "compressorjs";
 import { tmpdir } from "os";
+import { useSession } from "next-auth/react";
+import { userAgent } from "next/server";
 
 const cairo = Cairo({ subsets: ["latin"] });
 
@@ -30,42 +32,58 @@ export default function Profile() {
 
   const router = useRouter();
 
+  const { data: session } = useSession();
+
   const { profile } = router.query;
+
+  if (!profile) return null;
 
   const { account, web3 } = useWeb3();
 
   // const { address } = useWallet();
 
-  const { data } = trpc.user.getUserWithTickets.useQuery(undefined, {
-    onSuccess: (data) => {
-      if (data?.userWithTickets?.image) setPfp(data.userWithTickets.image);
-      if (data.userWithTickets?.banner) setBanner(data.userWithTickets.banner);
-    },
-    onError: (err) => {
-      console.log(err);
-    },
-    enabled: !!onTickets,
-  });
+  const { data, refetch } = trpc.user.getUserWithTickets.useQuery(
+    profile as string,
+    {
+      onSuccess: (data) => {
+        setPfp("");
+        setBanner("");
+        if (data?.userWithTickets?.image) setPfp(data.userWithTickets.image);
+        if (data.userWithTickets?.banner)
+          setBanner(data.userWithTickets.banner);
+      },
+      onError: (err) => {
+        console.log(err);
+      },
+      enabled: !!onTickets,
+    }
+  );
 
-  const { data: events } = trpc.user.getUserWithEvents.useQuery(undefined, {
-    onSuccess: (data) => {
-      if (data?.userWithEvents?.image) setPfp(data.userWithEvents.image);
-    },
-    onError: (err) => {
-      console.log(err);
-    },
-    enabled: !!onEvents,
-  });
+  const { data: events } = trpc.user.getUserWithEvents.useQuery(
+    profile as string,
+    {
+      onSuccess: (data) => {
+        if (data?.userWithEvents?.image) setPfp(data.userWithEvents.image);
+      },
+      onError: (err) => {
+        console.log(err);
+      },
+      enabled: !!onEvents,
+    }
+  );
 
-  const { data: likes } = trpc.user.getUserWithLikes.useQuery(undefined, {
-    onSuccess: (data) => {
-      if (data?.userWithLikes?.image) setPfp(data.userWithLikes.image);
-    },
-    onError: (err) => {
-      console.log(err);
-    },
-    enabled: !!onLikes,
-  });
+  const { data: likes } = trpc.user.getUserWithLikes.useQuery(
+    profile as string,
+    {
+      onSuccess: (data) => {
+        if (data?.userWithLikes?.image) setPfp(data.userWithLikes.image);
+      },
+      onError: (err) => {
+        console.log(err);
+      },
+      enabled: !!onLikes,
+    }
+  );
 
   const uploadProfilePicture = trpc.user.uploadProfilePicture.useMutation({
     onSuccess: (data) => {
@@ -84,6 +102,20 @@ export default function Profile() {
       console.log(err);
     },
   });
+
+  const follow = trpc.user.follow.useMutation({
+    onSuccess: (data) => {
+      console.log(data);
+      refetch();
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+
+  const followUser = () => {
+    follow.mutate(profile as string);
+  };
 
   // const compressImage = trpc.user.compressImage.useMutation()
 
@@ -239,12 +271,24 @@ export default function Profile() {
               </div>
             )}
           </div>
-          {profile === data?.userWithTickets?.id ? (
+          {profile === session?.user?.id ? (
             <button className="rounded-lg absolute right-5 mt-3 border border-slate-600 p-2">
               Edit Profile
             </button>
+          ) : data?.userWithTickets?.followers.find(
+              (f) => f.id === session?.user?.id
+            ) ? (
+            <button
+              onClick={() => followUser()}
+              className="rounded-lg absolute right-5 mt-3 border border-slate-600 p-2"
+            >
+              Unfollow
+            </button>
           ) : (
-            <button className="rounded-lg absolute right-5 mt-3 border border-slate-600 p-2">
+            <button
+              onClick={() => followUser()}
+              className="rounded-lg absolute right-5 mt-3 border border-slate-600 p-2"
+            >
               Follow
             </button>
           )}
@@ -257,7 +301,7 @@ export default function Profile() {
           {data?.userWithTickets?.bio ? (
             <p className="ml-4">{data.userWithTickets.bio}</p>
           ) : (
-            <button className="text-slate-500 ml-4">Create Bio</button>
+            <p className="text-slate-500 ml-4">No bio... boring.</p>
           )}
           <div className="flex space-x-2 ml-4 my-2">
             <p>{data?.userWithTickets?.following.length} Following</p>
